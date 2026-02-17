@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { useMemo, useState, useEffect } from "react";
 import { CheckCircle2, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+=======
+import { useMemo, useState } from "react";
+import { CheckCircle2, Play } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import logoGuardian from "../assets/logo-guardian.png";
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
 
 const MODULES = [
   { id: 1, title: "Obstruction", description: "Learn how websites make it hard for you to cancel subscriptions or delete your account." },
@@ -59,12 +66,16 @@ function Card({ children, className = "" }) {
 }
 
 export default function Home() {
+<<<<<<< HEAD
   // Load progress from cookies on initial mount
   const [completedModules, setCompletedModules] = useState(() => {
     const savedProgress = Cookies.get('dptrek_progress');
     return savedProgress ? JSON.parse(savedProgress) : [];
   });
   
+=======
+  const [completedModules, setCompletedModules] = useState([]);
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [textSize, setTextSize] = useState("medium"); // small, medium, large
@@ -72,11 +83,14 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   // Save progress to cookies whenever it changes
   useEffect(() => {
     Cookies.set('dptrek_progress', JSON.stringify(completedModules), { expires: 365 });
   }, [completedModules]);
 
+=======
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
   const progressPercent = useMemo(
     () => (completedModules.length / MODULES.length) * 100,
     [completedModules.length]
@@ -310,7 +324,18 @@ export default function Home() {
 
         {/* Hero Section */}
         <header className="text-center mb-12">
+<<<<<<< HEAD
           <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center shadow-lg">
+=======
+          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center overflow-hidden shadow-lg">
+            <img
+              src={logoGuardian}
+              alt=""
+              className="w-24 h-24 object-cover"
+              aria-hidden="true"
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
             <span className="text-5xl" aria-hidden="true">🛡️</span>
           </div>
 
@@ -543,7 +568,11 @@ export default function Home() {
                   Having trouble? Don't hesitate to ask someone you trust for help.
                 </p>
                 <Button variant="primary" size="md" className="w-full" aria-label="Get help">
+<<<<<<< HEAD
                   Contact Us
+=======
+                  📞 Get Help
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
                 </Button>
               </div>
             </div>
@@ -570,7 +599,11 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="text-center pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-600">
+<<<<<<< HEAD
               © 2026 Dark Patterns Education • Helping older adults stay safe online
+=======
+              © 2024 Dark Patterns Education • Helping older adults stay safe online
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
             </p>
           </div>
         </div>

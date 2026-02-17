@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "js-cookie": "^3.0.5",
+=======
+>>>>>>> d12734862dd9b76e961a286bacca9dbb306c2a36
     "lucide-react": "^0.564.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
