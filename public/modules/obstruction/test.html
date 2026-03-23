@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obstruction Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        .test-section { display: none; }
+        .test-section.active { display: block; }
+
+        /* Intro */
+        .intro-alert {
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .intro-alert h2 { font-size: 24px; color: #1a1a1a; margin-bottom: 20px; }
+        .intro-alert p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px; }
+        .next-btn {
+            background: #7c3aed; color: white; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+        }
+        .next-btn:hover { background: #6d28d9; }
+
+        /* Simulation Header */
+        .sim-header {
+            background: linear-gradient(to right, #f59e0b, #d97706);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #b45309;
+        }
+        .sim-header button {
+            padding: 10px 24px;
+            font-weight: bold;
+            font-size: 13px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .exit-btn { background: #dc2626; color: white; }
+        .exit-btn:hover { background: #b91c1c; }
+        .report-btn { background: #2563eb; color: white; }
+        .report-btn:hover { background: #1d4ed8; }
+        .sim-badge {
+            background: white;
+            color: #d97706;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* TEST 1: StreamFlix (Real Streaming Service) */
+        .streamflix {
+            background: #000;
+            min-height: calc(100vh - 61px);
+        }
+        .streamflix-nav {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .streamflix-logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: #e50914;
+            letter-spacing: -1px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-link:hover { color: #e50914; }
+        .account-section {
+            padding: 60px 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .breadcrumb {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .breadcrumb span { color: #fff; font-weight: 600; }
+        .account-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 40px;
+        }
+        .account-sidebar {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 24px;
+        }
+        .sidebar-item {
+            padding: 12px 16px;
+            color: #999;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: #333;
+            color: #fff;
+        }
+        .account-content {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 40px;
+        }
+        .content-header {
+            margin-bottom: 30px;
+        }
+        .content-header h1 {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .content-header p {
+            color: #999;
+            font-size: 15px;
+        }
+        .plan-card {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .plan-name {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .plan-price {
+            color: #e50914;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .plan-features {
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        .plan-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-upgrade {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-upgrade:hover { background: #c40812; }
+        .btn-manage {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-manage:hover { background: #444; }
+        .cancel-info {
+            background: #2a2a2a;
+            border-left: 3px solid #e50914;
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .cancel-info p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .modal-content h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .modal-content p {
+            color: #999;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .modal-btn-cancel {
+            flex: 1;
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .modal-btn-cancel:hover { background: #c40812; }
+        .modal-btn-keep {
+            flex: 1;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .modal-btn-keep:hover { background: #444; }
+
+        /* Transition */
+        .transition-screen {
+            display: none;
+            min-height: 100vh;
+            background: white;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 60px 40px;
+        }
+        .transition-screen.active { display: flex; }
+        .transition-screen h2 { font-size: 32px; color: #1a1a1a; margin-bottom: 16px; }
+        .transition-screen p { font-size: 18px; color: #666; margin-bottom: 32px; }
+
+        /* TEST 2: ShopHub (Real E-commerce) */
+        .shophub {
+            background: #fff;
+            min-height: calc(100vh - 61px);
+        }
+        .shophub-nav {
+            background: #fff;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .shophub-logo {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 24px;
+            font-size: 15px;
+        }
+        .nav-icons {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .icon-btn {
+            font-size: 20px;
+            cursor: pointer;
+            color: #4b5563;
+        }
+        .icon-btn:hover { color: #667eea; }
+        .shophub-content {
+            padding: 40px 50px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .product-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .product-item:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .product-image {
+            background: #f9fafb;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+        .product-info {
+            padding: 16px;
+        }
+        .product-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .product-rating {
+            color: #fbbf24;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .settings-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .settings-trigger:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .settings-modal.active { display: flex; }
+        .settings-panel {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .settings-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 16px 16px 0 0;
+        }
+        .settings-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .settings-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .settings-body {
+            padding: 32px;
+        }
+        .instruction-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .instruction-box p {
+            font-size: 14px;
+            color: #92400e;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .menu-item {
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-item:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+        .section-content {
+            display: none;
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+        .section-content.active { display: block; }
+        .section-content h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        .section-content p {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .option-item label {
+            font-size: 14px;
+            color: #1a1a1a;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn-section {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-section:hover { background: #5568d3; }
+        .btn-confirm {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        .btn-confirm:hover { background: #059669; }
+    </style>
+</head>
+<body>
+    <!-- Intro -->
+    <div class="test-section active" id="introSection">
+        <div class="intro-alert">
+            <h2>🎯 Obstruction Challenge</h2>
+            <p>Find the hidden reject option on each website. You need to get <strong>2 out of 2 correct</strong> to pass.</p>
+            <button class="next-btn" onclick="startTest1()">Start Test</button>
+        </div>
+    </div>
+
+    <!-- Test 1: StreamFlix -->
+    <div class="test-section" id="test1Section">
+        <div class="sim-header">
+            <button class="exit-btn">EXIT</button>
+            <div class="sim-badge">⚠ SIMULATION WEBSITE</div>
+            <button class="report-btn">REPORT</button>
+        </div>
+
+        <div class="streamflix">
+            <nav class="streamflix-nav">
+                <div class="streamflix-logo">STREAMFLIX</div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">TV Shows</a>
+                    <a href="#" class="nav-link">Movies</a>
+                    <a href="#" class="nav-link">My List</a>
+                </div>
+                <div class="nav-link">👤 Account</div>
+            </nav>
+
+            <div class="account-section">
+                <div class="breadcrumb">
+                    Account &gt; <span>Membership & Billing</span>
+                </div>
+
+                <div class="account-grid">
+                    <div class="account-sidebar">
+                        <div class="sidebar-item active">Membership</div>
+                        <div class="sidebar-item">Payment Methods</div>
+                        <div class="sidebar-item">Viewing History</div>
+                        <div class="sidebar-item">Devices</div>
+                        <div class="sidebar-item">Settings</div>
+                    </div>
+
+                    <div class="account-content">
+                        <div class="content-header">
+                            <h1>Your Membership</h1>
+                            <p>Manage your subscription and billing details</p>
+                        </div>
+
+                        <div class="plan-card">
+                            <div class="plan-header">
+                                <div class="plan-name">Premium Plan</div>
+                                <div class="plan-price">$15.99/mo</div>
+                            </div>
+                            <div class="plan-features">
+                                ✓ Watch on 4 devices at once<br>
+                                ✓ Ultra HD available<br>
+                                ✓ Download on up to 6 devices<br>
+                                ✓ No ads
+                            </div>
+                            <div class="plan-actions">
+                                <button class="btn-upgrade" onclick="handleTest1('upgrade')">Upgrade Plan</button>
+                                <button class="btn-manage" onclick="handleTest1('manage')">Manage Subscription</button>
+                            </div>
+
+                            <div class="cancel-info">
+                                <p>Need to cancel? You can cancel your subscription at any time. Your account will remain active until the end of your billing period.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel Modal -->
+        <div class="modal-overlay" id="cancelModal">
+            <div class="modal-content">
+                <h3>Cancel Subscription</h3>
+                <p>Are you sure you want to cancel your StreamFlix Premium subscription? You'll lose access to all premium features at the end of your current billing period.</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn-cancel" onclick="handleTest1('confirm-cancel')">Yes, Cancel Subscription</button>
+                    <button class="modal-btn-keep" onclick="handleTest1('keep')">Keep My Subscription</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transition -->
+    <div class="test-section transition-screen" id="transitionSection">
+        <h2>✅ Great job!</h2>
+        <p>Let's go to another example!</p>
+        <button class="next-btn" onclick="startTest2()">Next</button>
+    </div>
+
+    <!-- Test 2: ShopHub -->
+    <div class="test-section" id="test2Section">
+        <div class="sim-header">
+            <button class="exit-btn">EXIT</button>
+            <div class="sim-badge">⚠ SIMULATION WEBSITE</div>
+            <button class="report-btn">REPORT</button>
+        </div>
+
+        <div class="shophub">
+            <nav class="shophub-nav">
+                <div class="shophub-logo">ShopHub</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products...">
+                </div>
+                <div class="nav-icons">
+                    <div class="icon-btn">🛒</div>
+                    <div class="icon-btn">👤</div>
+                </div>
+            </nav>
+
+            <div class="shophub-content">
+                <div class="products-grid">
+                    <div class="product-item">
+                        <div class="product-image">📱</div>
+                        <div class="product-info">
+                            <div class="product-title">Smartphone X Pro</div>
+                            <div class="product-rating">⭐⭐⭐⭐⭐ 4.8</div>
+                            <div class="product-price">$899.00</div>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-image">💻</div>
+                        <div class="product-info">
+                            <div class="product-title">Laptop Ultra Slim</div>
+                            <div class="product-rating">⭐⭐⭐⭐ 4.6</div>
+                            <div class="product-price">$1,299.00</div>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-image">🎧</div>
+                        <div class="product-info">
+                            <div class="product-title">Wireless Headphones</div>
+                            <div class="product-rating">⭐⭐⭐⭐⭐ 4.9</div>
+                            <div class="product-price">$249.00</div>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-image">⌚</div>
+                        <div class="product-info">
+                            <div class="product-title">Smart Watch Series 5</div>
+                            <div class="product-rating">⭐⭐⭐⭐ 4.7</div>
+                            <div class="product-price">$399.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="settings-trigger" onclick="openSettings()">⚙️</button>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="settings-modal active" id="settingsModal">
+            <div class="settings-panel">
+                <div class="settings-header">
+                    <h2>Privacy & Settings</h2>
+                    <p>Manage your account preferences and privacy settings</p>
+                </div>
+                <div class="settings-body">
+                    <div class="instruction-box">
+                        <p><strong>Instruction:</strong> This shopping website uses cookies to track your activities and deliver targeted ads. If you don't want targeted ads, find the setting to disable ad tracking.</p>
+                    </div>
+
+                    <div class="menu-item" onclick="showSection('general')">
+                        <span>General Settings</span>
+                        <span>›</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('privacy')">
+                        <span>Privacy & Data</span>
+                        <span>›</span>
+                    </div>
+
+                    <div class="section-content" id="generalSection">
+                        <h4>General Settings</h4>
+                        <p>Configure your general account preferences</p>
+                        <button class="btn-section" onclick="showSection('about')">About & Help</button>
+                    </div>
+
+                    <div class="section-content" id="aboutSection">
+                        <h4>About & Help</h4>
+                        <p>Learn more about ShopHub and get help</p>
+                        <button class="btn-section" onclick="showSection('advertising')">Advertising Preferences</button>
+                    </div>
+
+                    <div class="section-content" id="privacySection">
+                        <h4>Privacy & Data Settings</h4>
+                        <p>Control how your data is used</p>
+                        <div class="option-item">
+                            <input type="checkbox" id="dataCollection">
+                            <label for="dataCollection">Allow ShopHub to collect my data for personalized recommendations</label>
+                        </div>
+                        <button class="btn-confirm" onclick="handleTest2('privacy')">Save Preferences</button>
+                    </div>
+
+                    <div class="section-content" id="advertisingSection">
+                        <h4>Advertising Preferences</h4>
+                        <p>Control what ads you see based on your activity</p>
+                        <div class="option-item">
+                            <input type="checkbox" id="personalizedAds">
+                            <label for="personalizedAds">Enable Personalized Ads</label>
+                        </div>
+                        <button class="btn-confirm" onclick="handleTest2('advertising')">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+
+        function startTest1() {
+            document.getElementById('introSection').classList.remove('active');
+            document.getElementById('test1Section').classList.add('active');
+            notifyInteraction();
+        }
+
+        function handleTest1(action) {
+            notifyInteraction();
+            if (action === 'manage') {
+                document.getElementById('cancelModal').classList.add('active');
+            } else if (action === 'confirm-cancel') {
+                score++;
+                document.getElementById('test1Section').classList.remove('active');
+                document.getElementById('transitionSection').classList.add('active');
+            } else {
+                document.getElementById('test1Section').classList.remove('active');
+                document.getElementById('transitionSection').classList.add('active');
+            }
+        }
+
+        function startTest2() {
+            document.getElementById('transitionSection').classList.remove('active');
+            document.getElementById('test2Section').classList.add('active');
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function showSection(section) {
+            notifyInteraction();
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            if (section === 'general') document.getElementById('generalSection').classList.add('active');
+            else if (section === 'about') document.getElementById('aboutSection').classList.add('active');
+            else if (section === 'privacy') document.getElementById('privacySection').classList.add('active');
+            else if (section === 'advertising') document.getElementById('advertisingSection').classList.add('active');
+        }
+
+        function handleTest2(action) {
+            notifyInteraction();
+            if (action === 'advertising') {
+                const checkbox = document.getElementById('personalizedAds');
+                if (!checkbox.checked) score++;
+                completeTest();
+            } else {
+                completeTest();
+            }
+        }
+
+        function completeTest() {
+            const passed = score >= 2;
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'test-complete',
+                    score: score,
+                    total: 2,
+                    passed: passed
+                }, '*');
+            }
+        }
+
+        function notifyInteraction() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'user_interacted' }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

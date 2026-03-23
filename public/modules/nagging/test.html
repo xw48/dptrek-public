@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nagging Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* ===== Intro ===== */
+        .intro-screen {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        .intro-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 540px;
+            text-align: center;
+        }
+        .intro-box h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; color: #1e293b; }
+        .intro-box p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 8px; }
+        .intro-rules {
+            text-align: left;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin: 18px 0;
+        }
+        .intro-rules li {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 8px;
+            list-style: none;
+            padding-left: 24px;
+            position: relative;
+        }
+        .intro-rules li::before {
+            content: "🎯";
+            position: absolute;
+            left: 0;
+        }
+        .intro-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .intro-btn:hover { background: #4f46e5; }
+
+        /* ===== Scenario Container ===== */
+        .scenario { display: none; min-height: 100vh; }
+        .scenario.active { display: block; }
+
+        /* ========================================
+           SCENARIO 1: News Website
+           ======================================== */
+        .news-site { background: white; }
+        .news-header {
+            background: #1a1a1a;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .news-logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            font-family: Georgia, serif;
+        }
+        .news-logo span { color: #ef4444; }
+        .news-nav {
+            display: flex;
+            gap: 20px;
+        }
+        .news-nav a {
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .news-subscribe-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .news-breaking {
+            background: #fef2f2;
+            border-bottom: 1px solid #fecaca;
+            padding: 10px 32px;
+            font-size: 13px;
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .news-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+        .news-category {
+            font-size: 12px;
+            color: #ef4444;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .news-title {
+            font-family: Georgia, serif;
+            font-size: 34px;
+            line-height: 1.2;
+            color: #111;
+            margin-bottom: 14px;
+        }
+        .news-meta {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .news-hero-img {
+            width: 100%;
+            height: 380px;
+            background: linear-gradient(135deg, #dbeafe, #c7d2fe, #e0e7ff);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+        }
+        .news-body p {
+            font-family: Georgia, serif;
+            font-size: 17px;
+            line-height: 1.8;
+            color: #374151;
+            margin-bottom: 18px;
+        }
+
+        /* News Browser Notification Popup (mimics real browser prompt) */
+        .browser-notif {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+            width: 400px;
+            max-width: 92%;
+            z-index: 1000;
+            overflow: hidden;
+            animation: dropNotif 0.3s ease-out;
+        }
+        .browser-notif.active { display: block; }
+        @keyframes dropNotif {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .bn-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 18px 0;
+        }
+        .bn-site-icon {
+            width: 32px;
+            height: 32px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: 900;
+            font-family: Georgia, serif;
+        }
+        .bn-site-icon span { color: #ef4444; }
+        .bn-header-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .bn-message {
+            padding: 12px 18px;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        .bn-url {
+            font-size: 11px;
+            color: #94a3b8;
+            padding: 0 18px 6px;
+        }
+        .bn-btns {
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+        }
+        .bn-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+        }
+        .bn-btn:first-child { border-right: 1px solid #e5e7eb; color: #6b7280; }
+        .bn-btn:last-child { color: #3b82f6; }
+        .bn-btn:hover { background: #f9fafb; }
+
+        /* ========================================
+           SCENARIO 2: Fitness App
+           ======================================== */
+        .fitness-app {
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+        }
+        .fit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .fit-logo {
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .fit-logo span { color: #22c55e; }
+        .fit-header-btns {
+            display: flex;
+            gap: 12px;
+        }
+        .fit-header-btn {
+            background: #1e293b;
+            border: none;
+            color: #94a3b8;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .fit-content {
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .fit-greeting {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .fit-main-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+        .fit-streak-card {
+            background: linear-gradient(135deg, #166534, #15803d);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .fit-streak-label {
+            font-size: 13px;
+            color: #bbf7d0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .fit-streak-number {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+        .fit-streak-sub { font-size: 14px; color: #86efac; }
+        .fit-workout-card {
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fit-wk-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .fit-wk-icon {
+            width: 48px;
+            height: 48px;
+            background: #334155;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .fit-wk-name { font-size: 15px; font-weight: 700; }
+        .fit-wk-detail { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+        .fit-wk-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .fit-wk-done { background: #166534; color: #86efac; }
+        .fit-wk-next { background: #3b82f6; color: white; }
+
+        /* Fitness Rating Popup */
+        .rating-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1e293b;
+            border-radius: 20px;
+            width: 380px;
+            max-width: 92%;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: scaleIn 0.3s ease-out;
+        }
+        .rating-popup.active { display: block; }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .rating-popup h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .rating-popup p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .star-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .star-btn {
+            font-size: 36px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s;
+            filter: grayscale(100%);
+        }
+        .star-btn:hover, .star-btn.lit {
+            filter: none;
+            transform: scale(1.2);
+        }
+        .rating-submit {
+            width: 100%;
+            padding: 14px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .rating-dismiss {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .fit-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+        }
+        .fit-overlay.active { display: block; }
+
+        /* ===== Transition Modal ===== */
+        .transition-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .transition-modal.active { display: flex; }
+        .transition-box {
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            max-width: 460px;
+            width: 90%;
+        }
+        .transition-box h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+        .transition-box p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        .transition-feedback {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 0 16px;
+        }
+        .feedback-pass { background: #f0fdf4; color: #16a34a; }
+        .feedback-fail { background: #fef2f2; color: #ef4444; }
+        .transition-btn {
+            background: #6366f1;
+            color: white;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* ===== Complete Modal ===== */
+        .complete-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .complete-modal.active { display: flex; }
+        .complete-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+        }
+        .complete-emoji { font-size: 56px; margin-bottom: 14px; }
+        .complete-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: #1e293b; }
+        .complete-score {
+            font-size: 42px;
+            font-weight: 900;
+            margin: 12px 0;
+        }
+        .complete-text { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        .complete-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- INTRO -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-box">
+            <div style="font-size: 52px; margin-bottom: 12px;">🎯</div>
+            <h2>Test Your Knowledge</h2>
+            <p>You'll face 2 realistic scenarios with nagging patterns. Your goal: resist the pressure and don't give in!</p>
+            <ul class="intro-rules">
+                <li>Scenario 1: A news website that wants to send notifications</li>
+                <li>Scenario 2: A fitness app that wants you to rate it</li>
+                <li>Keep saying "No" — don't let them wear you down!</li>
+            </ul>
+            <button class="intro-btn" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 1: News Site ===== -->
+    <div class="scenario news-site" id="scenario1">
+        <header class="news-header">
+            <div class="news-logo">The Daily<span>Wire</span>Press</div>
+            <nav class="news-nav">
+                <a href="#">Politics</a>
+                <a href="#">Tech</a>
+                <a href="#">Science</a>
+                <a href="#">Health</a>
+                <a href="#">Opinion</a>
+            </nav>
+            <button class="news-subscribe-btn">Subscribe</button>
+        </header>
+        <div class="news-breaking">🔴 BREAKING: Major tech company announces free health monitoring for seniors — Read more</div>
+
+        <div class="news-content">
+            <div class="news-category">Technology & Health</div>
+            <h1 class="news-title">New Study: Simple Online Habits That Keep Your Personal Data Safe</h1>
+            <div class="news-meta">By James Porter  |  March 11, 2026  |  5 min read</div>
+            <div class="news-hero-img">🔐</div>
+            <div class="news-body">
+                <p>A new study published this week found that most personal data breaches could be prevented by following a few simple online habits. Researchers from three universities examined over 10,000 cases of data theft and found a clear pattern.</p>
+                <p>"The number one thing people can do is be cautious about what they agree to online," said Dr. Maria Santos, lead researcher at the Digital Safety Institute. "Many people click 'Allow' on popups without reading them just to make them go away."</p>
+                <p>The study recommends always reading popup messages carefully, saying "No" to notification requests from websites you don't fully trust, and being wary of websites that ask you the same question multiple times after you've already declined.</p>
+            </div>
+        </div>
+
+        <!-- Browser Notification Prompt -->
+        <div class="browser-notif" id="browserNotif">
+            <div class="bn-header">
+                <div class="bn-site-icon">D<span>W</span></div>
+                <div class="bn-header-text" id="bnTitle">DailyWirePress wants to send notifications</div>
+            </div>
+            <div class="bn-message" id="bnMessage">Stay updated with breaking news alerts and top stories delivered in real time.</div>
+            <div class="bn-url">dailywirepress.com</div>
+            <div class="bn-btns">
+                <button class="bn-btn" id="bnBlock" onclick="handleS1Deny()">Block</button>
+                <button class="bn-btn" id="bnAllow" onclick="handleS1Allow()">Allow</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 2: Fitness App ===== -->
+    <div class="scenario fitness-app" id="scenario2">
+        <div class="fit-header">
+            <div class="fit-logo">Fit<span>Track</span></div>
+            <div class="fit-header-btns">
+                <button class="fit-header-btn">🔔</button>
+                <button class="fit-header-btn">⚙️</button>
+            </div>
+        </div>
+
+        <div class="fit-content">
+            <div class="fit-greeting">Good morning, Sarah!</div>
+            <div class="fit-main-title">Today's Workout Plan</div>
+
+            <div class="fit-streak-card">
+                <div class="fit-streak-label">🔥 Current Streak</div>
+                <div class="fit-streak-number">14</div>
+                <div class="fit-streak-sub">days in a row — keep it up!</div>
+            </div>
+
+            <div class="fit-workout-card">
+                <div class="fit-wk-left">
+                    <div class="fit-wk-icon">🏃</div>
+                    <div>
+                        <div class="fit-wk-name">Morning Walk</div>
+                        <div class="fit-wk-detail">30 min · 2.1 miles · 180 cal</div>
+                    </div>
+                </div>
+                <div class="fit-wk-status fit-wk-done">✓ Done</div>
+            </div>
+
+            <div class="fit-workout-card">
+                <div class="fit-wk-left">
+                    <div class="fit-wk-icon">🧘</div>
+                    <div>
+                        <div class="fit-wk-name">Gentle Stretching</div>
+                        <div class="fit-wk-detail">15 min · Flexibility · 60 cal</div>
+                    </div>
+                </div>
+                <div class="fit-wk-status fit-wk-done">✓ Done</div>
+            </div>
+
+            <div class="fit-workout-card">
+                <div class="fit-wk-left">
+                    <div class="fit-wk-icon">💪</div>
+                    <div>
+                        <div class="fit-wk-name">Light Strength</div>
+                        <div class="fit-wk-detail">20 min · Upper Body · 120 cal</div>
+                    </div>
+                </div>
+                <div class="fit-wk-status fit-wk-next">Start →</div>
+            </div>
+        </div>
+
+        <div class="fit-overlay" id="fitOverlay"></div>
+
+        <!-- Rating Popup -->
+        <div class="rating-popup" id="ratingPopup">
+            <h3 id="ratingTitle">Enjoying FitTrack?</h3>
+            <p id="ratingMsg">You've completed 14 days in a row! If you're enjoying the app, would you mind giving us a quick rating?</p>
+            <div class="star-row" id="starRow">
+                <button class="star-btn" data-star="1" onclick="selectStar(1)">⭐</button>
+                <button class="star-btn" data-star="2" onclick="selectStar(2)">⭐</button>
+                <button class="star-btn" data-star="3" onclick="selectStar(3)">⭐</button>
+                <button class="star-btn" data-star="4" onclick="selectStar(4)">⭐</button>
+                <button class="star-btn" data-star="5" onclick="selectStar(5)">⭐</button>
+            </div>
+            <button class="rating-submit" id="ratingSubmit" onclick="handleS2Rate()">Submit Rating</button>
+            <button class="rating-dismiss" id="ratingDismiss" onclick="handleS2Dismiss()">Not now, maybe later</button>
+        </div>
+    </div>
+
+    <!-- TRANSITION -->
+    <div class="transition-modal" id="transitionModal">
+        <div class="transition-box">
+            <div style="font-size: 48px; margin-bottom: 12px;" id="transEmoji">✅</div>
+            <h2 id="transTitle">Scenario 1 Complete</h2>
+            <div class="transition-feedback" id="transFeedback"></div>
+            <p id="transText"></p>
+            <button class="transition-btn" onclick="goToNextScenario()">Next Scenario →</button>
+        </div>
+    </div>
+
+    <!-- COMPLETE -->
+    <div class="complete-modal" id="completeModal">
+        <div class="complete-box">
+            <div class="complete-emoji" id="finalEmoji">🎉</div>
+            <h2 class="complete-title" id="finalTitle">Test Complete!</h2>
+            <div class="complete-score" id="finalScore"></div>
+            <p class="complete-text" id="finalText"></p>
+            <button class="complete-btn" onclick="finishTest()">Finish</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let s1NagCount = 0;
+        let s2NagCount = 0;
+        const S1_MAX_NAGS = 3;
+        const S2_MAX_NAGS = 3;
+
+        // Scenario 1 nag variations
+        const s1Nags = [
+            { title: "DailyWirePress wants to send notifications", msg: "Stay updated with breaking news alerts and top stories delivered in real time.", block: "Block", allow: "Allow" },
+            { title: "Don't miss important news!", msg: "Over 2 million readers get our alerts. Turn on notifications so you never miss a story.", block: "No thanks", allow: "Turn on" },
+            { title: "Are you sure?", msg: "You might miss critical breaking news. We only send 2–3 notifications per day — we promise.", block: "I'm sure", allow: "OK, allow" },
+        ];
+
+        // Scenario 2 nag variations
+        const s2Nags = [
+            { title: "Enjoying FitTrack?", msg: "You've completed 14 days in a row! Would you mind giving us a quick rating?", dismiss: "Not now, maybe later" },
+            { title: "Your opinion matters!", msg: "A 5-star rating helps other people discover FitTrack. It only takes a second!", dismiss: "Remind me later" },
+            { title: "One last ask...", msg: "We noticed you haven't rated us yet. Please consider supporting the team behind your daily workouts!", dismiss: "Stop asking me" },
+        ];
+
+        function startTest() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('scenario1').classList.add('active');
+            setTimeout(() => showS1Nag(), 2500);
+        }
+
+        // ===== SCENARIO 1 =====
+        function showS1Nag() {
+            const nag = s1Nags[s1NagCount];
+            document.getElementById('bnTitle').textContent = nag.title;
+            document.getElementById('bnMessage').textContent = nag.msg;
+            document.getElementById('bnBlock').textContent = nag.block;
+            document.getElementById('bnAllow').textContent = nag.allow;
+            document.getElementById('browserNotif').classList.add('active');
+            notifyInteraction();
+        }
+
+        function handleS1Deny() {
+            document.getElementById('browserNotif').classList.remove('active');
+            s1NagCount++;
+            if (s1NagCount < S1_MAX_NAGS) {
+                setTimeout(() => showS1Nag(), 1200);
+            } else {
+                score++;
+                showTransition(
+                    "✅", "Scenario 1 Complete",
+                    "You resisted!", "feedback-pass",
+                    "Great job! You said 'No' " + S1_MAX_NAGS + " times despite the website changing its message to pressure you. Notice how it went from a casual ask to guilt-tripping."
+                );
+            }
+        }
+
+        function handleS1Allow() {
+            document.getElementById('browserNotif').classList.remove('active');
+            showTransition(
+                "⚠️", "Scenario 1 Complete",
+                "You gave in", "feedback-fail",
+                "The website nagged you until you allowed notifications. Next time, keep saying 'No' — they change the wording to make you feel bad, but it's still the same request."
+            );
+        }
+
+        // ===== SCENARIO 2 =====
+        function showS2Nag() {
+            const nag = s2Nags[s2NagCount];
+            document.getElementById('ratingTitle').textContent = nag.title;
+            document.getElementById('ratingMsg').textContent = nag.msg;
+            document.getElementById('ratingDismiss').textContent = nag.dismiss;
+            // Reset stars
+            document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('lit'));
+            document.getElementById('fitOverlay').classList.add('active');
+            document.getElementById('ratingPopup').classList.add('active');
+            notifyInteraction();
+        }
+
+        function selectStar(n) {
+            document.querySelectorAll('.star-btn').forEach((s, i) => {
+                s.classList.toggle('lit', i < n);
+            });
+        }
+
+        function handleS2Rate() {
+            document.getElementById('fitOverlay').classList.remove('active');
+            document.getElementById('ratingPopup').classList.remove('active');
+            showComplete();
+        }
+
+        function handleS2Dismiss() {
+            document.getElementById('ratingPopup').classList.remove('active');
+            document.getElementById('fitOverlay').classList.remove('active');
+            s2NagCount++;
+            if (s2NagCount < S2_MAX_NAGS) {
+                setTimeout(() => showS2Nag(), 1500);
+            } else {
+                score++;
+                showComplete();
+            }
+        }
+
+        // ===== TRANSITIONS =====
+        function showTransition(emoji, title, feedback, feedbackClass, text) {
+            document.getElementById('transEmoji').textContent = emoji;
+            document.getElementById('transTitle').textContent = title;
+            document.getElementById('transFeedback').textContent = feedback;
+            document.getElementById('transFeedback').className = 'transition-feedback ' + feedbackClass;
+            document.getElementById('transText').textContent = text;
+            document.getElementById('transitionModal').classList.add('active');
+        }
+
+        function goToNextScenario() {
+            document.getElementById('transitionModal').classList.remove('active');
+            document.getElementById('scenario1').classList.remove('active');
+            document.getElementById('scenario2').classList.add('active');
+            setTimeout(() => showS2Nag(), 2000);
+        }
+
+        function showComplete() {
+            const passed = score >= 2;
+            document.getElementById('finalEmoji').textContent = passed ? '🎉' : '💪';
+            document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
+            document.getElementById('finalScore').textContent = score + ' / 2';
+            document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
+            document.getElementById('finalText').textContent = passed
+                ? 'You successfully resisted nagging in both scenarios! You now know how to recognize when websites and apps are trying to wear you down with repeated requests.'
+                : 'You gave in to some nagging. Remember: if a website or app keeps asking the same thing in different ways after you\'ve said no, that\'s nagging — stay firm!';
+            document.getElementById('completeModal').classList.add('active');
+        }
+
+        function finishTest() {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'test-complete',
+                    score: score,
+                    total: 2,
+                    passed: score >= 2
+                }, '*');
+            }
+        }
+
+        function notifyInteraction() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'user_interacted' }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

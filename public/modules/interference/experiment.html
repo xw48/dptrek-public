@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodDash Delivery</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; }
+
+        .site { min-height: 100vh; }
+
+        .navbar { background: #dc2626; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { color: white; font-size: 22px; font-weight: 800; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px; }
+
+        .hero {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 40px; text-align: center;
+        }
+        .hero h1 { font-size: 28px; font-weight: 800; color: #92400e; margin-bottom: 8px; }
+        .hero p { font-size: 16px; color: #a16207; }
+        .hero-img { font-size: 80px; margin-bottom: 16px; }
+
+        .content { max-width: 800px; margin: 0 auto; padding: 32px 20px; }
+
+        .order-card {
+            background: white; border-radius: 14px; border: 1px solid #e5e7eb;
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .order-header { background: #f9fafb; padding: 18px 24px; border-bottom: 1px solid #e5e7eb; }
+        .order-header h2 { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+        .order-body { padding: 24px; }
+
+        .order-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #f3f4f6;
+        }
+        .order-item:last-child { border-bottom: none; }
+        .item-left { display: flex; align-items: center; gap: 12px; }
+        .item-emoji { font-size: 28px; }
+        .item-name { font-size: 15px; font-weight: 600; color: #374151; }
+        .item-desc { font-size: 12px; color: #9ca3af; }
+        .item-price { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+
+        .tip-section {
+            margin-top: 20px; padding: 18px; background: #f0fdf4;
+            border: 1px solid #bbf7d0; border-radius: 10px;
+        }
+        .tip-section h3 { font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 10px; }
+        .tip-row { display: flex; align-items: center; gap: 10px; }
+        .tip-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #16a34a; cursor: pointer; }
+        .tip-row label { font-size: 14px; font-weight: 600; color: #374151; cursor: pointer; }
+        .tip-row label span { color: #16a34a; }
+
+        .totals { margin-top: 20px; padding-top: 16px; border-top: 2px solid #e5e7eb; }
+        .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #6b7280; }
+        .total-row.final {
+            font-size: 18px; font-weight: 800; color: #1a1a1a;
+            padding-top: 10px; border-top: 1px solid #e5e7eb; margin-top: 6px;
+        }
+        .tip-amount { color: #16a34a; font-weight: 600; }
+
+        .confirm-btn {
+            width: 100%; padding: 16px; background: #dc2626; color: white;
+            border: none; border-radius: 10px; font-size: 17px; font-weight: 700;
+            cursor: pointer; margin-top: 20px;
+        }
+        .confirm-btn:hover { background: #b91c1c; }
+
+        .result-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .result-overlay.active { display: flex; }
+        .result-box {
+            background: white; border-radius: 14px; padding: 32px;
+            max-width: 460px; width: 90%; text-align: center;
+        }
+        .result-box h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .result-box p { font-size: 15px; color: #666; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="site">
+        <nav class="navbar">
+            <div class="nav-logo">🍕 FoodDash</div>
+            <div class="nav-links">
+                <a href="#">Menu</a>
+                <a href="#">Orders</a>
+                <a href="#">Account</a>
+            </div>
+        </nav>
+
+        <div class="hero">
+            <div class="hero-img">🛵</div>
+            <h1>Order Food Online Today!</h1>
+            <p>Fast delivery to your doorstep</p>
+        </div>
+
+        <div class="content">
+            <div class="order-card">
+                <div class="order-header"><h2>Your Order Summary</h2></div>
+                <div class="order-body">
+                    <div class="order-item">
+                        <div class="item-left"><div class="item-emoji">🍔</div><div><div class="item-name">Classic Burger</div><div class="item-desc">With fries and drink</div></div></div>
+                        <div class="item-price">$12.99</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="item-left"><div class="item-emoji">🥗</div><div><div class="item-name">Caesar Salad</div><div class="item-desc">Fresh romaine, croutons</div></div></div>
+                        <div class="item-price">$8.99</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="item-left"><div class="item-emoji">🍰</div><div><div class="item-name">Cheesecake Slice</div><div class="item-desc">New York style</div></div></div>
+                        <div class="item-price">$6.50</div>
+                    </div>
+
+                    <div class="tip-section">
+                        <h3>💚 Support Your Delivery Driver</h3>
+                        <div class="tip-row">
+                            <input type="checkbox" id="tipCheckbox" checked onchange="updateTotal()">
+                            <label for="tipCheckbox">Add <span>20% tip</span> ($5.70)</label>
+                        </div>
+                    </div>
+
+                    <div class="totals">
+                        <div class="total-row"><span>Subtotal</span><span>$28.48</span></div>
+                        <div class="total-row"><span>Delivery Fee</span><span>$3.99</span></div>
+                        <div class="total-row" id="tipRow"><span>Tip</span><span class="tip-amount" id="tipDisplay">$5.70</span></div>
+                        <div class="total-row final"><span>Total</span><span id="totalDisplay">$38.17</span></div>
+                    </div>
+
+                    <button class="confirm-btn" onclick="handleConfirm()">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-box">
+            <div style="font-size:48px;margin-bottom:12px;" id="resultEmoji"></div>
+            <h3 id="resultTitle"></h3>
+            <p id="resultMsg"></p>
+        </div>
+    </div>
+
+    <script>
+        function updateTotal() {
+            var tipChecked = document.getElementById('tipCheckbox').checked;
+            var tipAmount = tipChecked ? 5.70 : 0;
+            var total = 28.48 + 3.99 + tipAmount;
+            document.getElementById('tipDisplay').textContent = tipChecked ? '$5.70' : '$0.00';
+            document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+        }
+
+        function handleConfirm() {
+            var tipChecked = document.getElementById('tipCheckbox').checked;
+
+            if (tipChecked) {
+                document.getElementById('resultEmoji').textContent = '💸';
+                document.getElementById('resultTitle').textContent = 'You paid an extra $5.70!';
+                document.getElementById('resultMsg').textContent = 'The 20% tip was pre-selected. You paid $38.17 instead of $32.47. Always check for pre-selected charges before confirming!';
+            } else {
+                document.getElementById('resultEmoji').textContent = '✅';
+                document.getElementById('resultTitle').textContent = 'Great job!';
+                document.getElementById('resultMsg').textContent = 'You noticed the pre-selected 20% tip and unchecked it. You saved $5.70!';
+            }
+
+            document.getElementById('resultOverlay').classList.add('active');
+
+            setTimeout(function() {
+                notifyComplete(tipChecked ? 'accepted' : 'declined');
+            }, 2500);
+        }
+
+        function notifyComplete(result) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

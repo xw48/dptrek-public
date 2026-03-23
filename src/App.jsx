@@ -1,12 +1,23 @@
-import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Module from "./pages/Module";
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { initPostHog } from './posthog';
+import Home from './pages/Home';
+import Module from './pages/Module';
 
-export default function App() {
+function App() {
+  // Initialize PostHog when app loads
+  useEffect(() => {
+    initPostHog();
+  }, []);
+
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/module/:id" element={<Module />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/module/:id" element={<Module />} />
+      </Routes>
+    </Router>
   );
 }
+
+export default App;

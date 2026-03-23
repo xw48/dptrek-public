@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEasy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .intro-alert {
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .intro-alert h2 { font-size: 24px; color: #1a1a1a; margin-bottom: 20px; }
+        .intro-alert p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px; }
+        .next-btn {
+            background: #2563eb; color: white; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+        }
+        .next-btn:hover { background: #1d4ed8; }
+        .website-container { display: none; }
+        .website-container.active { display: block; }
+        .website-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 30px 40px; color: white;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 28px; font-weight: 800; }
+        .nav { display: flex; gap: 30px; }
+        .nav a { color: white; text-decoration: none; font-weight: 500; }
+        .hero {
+            background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);
+            padding: 60px 40px; text-align: center; color: white;
+        }
+        .hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 16px; }
+        .hero p { font-size: 18px; margin-bottom: 30px; }
+        .shop-btn {
+            background: white; color: #f5576c;
+            padding: 14px 36px; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+        }
+        .products {
+            padding: 40px; display: grid;
+            grid-template-columns: repeat(3, 1fr); gap: 24px;
+        }
+        .product-card {
+            border: 2px solid #e5e7eb; border-radius: 12px;
+            padding: 20px; text-align: center;
+        }
+        .product-img { font-size: 64px; margin-bottom: 16px; }
+        .product-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .product-price { font-size: 20px; font-weight: 700; color: #6366f1; }
+        .cookie-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .cookie-overlay.active { display: flex; }
+        .cookie-popup {
+            background: #2a2a2a; color: white;
+            border-radius: 12px; padding: 40px;
+            max-width: 550px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .cookie-popup h2 { font-size: 24px; margin-bottom: 16px; }
+        .cookie-popup p { font-size: 14px; color: #ccc; line-height: 1.7; margin-bottom: 12px; }
+        .cookie-popup a { color: #60a5fa; text-decoration: none; }
+        .cookie-options { display: none; margin: 20px 0; }
+        .cookie-options.active { display: block; }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px;
+            margin: 12px 0; padding: 10px;
+            background: rgba(255, 255, 255, 0.05); border-radius: 8px;
+        }
+        .checkbox-item input { width: 20px; height: 20px; cursor: pointer; }
+        .checkbox-item label { font-size: 14px; cursor: pointer; }
+        .button-group { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-allow {
+            flex: 1; background: #2563eb; color: white; border: none;
+            padding: 16px; font-size: 16px; font-weight: 700;
+            border-radius: 8px; cursor: pointer;
+        }
+        .btn-reject {
+            flex: 1; background: #374151; color: #d1d5db; border: none;
+            padding: 16px; font-size: 16px; font-weight: 700;
+            border-radius: 8px; cursor: pointer;
+        }
+        .btn-confirm {
+            display: none; width: 100%; background: #10b981; color: white;
+            border: none; padding: 16px; font-size: 16px; font-weight: 700;
+            border-radius: 8px; cursor: pointer; margin-top: 12px;
+        }
+        .btn-confirm.active { display: block; }
+        
+        /* Ad Consequence Overlay */
+        .ads-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8); z-index: 2000;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .ads-overlay.active { display: flex; }
+        .ads-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .ads-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .ads-header h2 {
+            font-size: 28px;
+            color: #dc2626;
+            margin-bottom: 12px;
+        }
+        .warning-box {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .warning-box p {
+            color: #991b1b;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .fake-ads {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .fake-ad {
+            border: 3px solid #ef4444;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            animation: shake 0.5s ease-in-out infinite;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .fake-ad .ad-emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .fake-ad .ad-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 6px;
+        }
+        .fake-ad .ad-text {
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.4;
+        }
+        .ads-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn-try-again {
+            flex: 1;
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-try-again:hover {
+            background: #b91c1c;
+        }
+        .btn-continue-anyway {
+            flex: 1;
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-continue-anyway:hover {
+            background: #4b5563;
+        }
+        
+        .success-message {
+            display: none; text-align: center; padding: 60px 40px;
+            background: white; border-radius: 12px;
+            max-width: 600px; margin: 50px auto;
+        }
+        .success-message.active { display: block; }
+        .success-icon { font-size: 80px; margin-bottom: 20px; }
+        .success-message h2 { font-size: 28px; color: #1a1a1a; margin-bottom: 12px; }
+        .success-message p { font-size: 16px; color: #666; line-height: 1.6; }
+        .highlight {
+            background: #fef3c7; padding: 2px 6px;
+            border-radius: 4px; font-weight: 700; color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-alert" id="introAlert">
+        <h2>Shopping Website Experience</h2>
+        <p>Imagine you're signing up for a shopping website. Please pay attention to website cookies setting!</p>
+        <button class="next-btn" onclick="startExperience()">Next</button>
+    </div>
+    
+    <div class="website-container" id="websiteContainer">
+        <div class="website-header">
+            <div class="logo">🛍️ ShopEasy</div>
+            <nav class="nav">
+                <a href="#">Shop</a>
+                <a href="#">Deals</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+        <div class="hero">
+            <h1>Summer Sale! 50% Off</h1>
+            <p>Shop the latest trends at unbeatable prices</p>
+            <button class="shop-btn">Shop Now</button>
+        </div>
+        <div class="products">
+            <div class="product-card">
+                <div class="product-img">👕</div>
+                <div class="product-title">Summer T-Shirt</div>
+                <div class="product-price">$29.99</div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">👟</div>
+                <div class="product-title">Running Shoes</div>
+                <div class="product-price">$79.99</div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">👜</div>
+                <div class="product-title">Designer Bag</div>
+                <div class="product-price">$149.99</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="success-message" id="successMessage">
+        <div class="success-icon" id="successIcon"></div>
+        <h2 id="successTitle"></h2>
+        <p id="successText"></p>
+    </div>
+    
+    <div class="cookie-overlay" id="cookieOverlay">
+        <div class="cookie-popup">
+            <h2>Website Cookies Setting</h2>
+            <p>Our websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies.</p>
+            <p><a href="#">To learn more, read our Privacy Policy.</a></p>
+            <div class="cookie-options" id="cookieOptions">
+                <div class="checkbox-item"><input type="checkbox" id="analytics" checked><label for="analytics">Analytics Cookies</label></div>
+                <div class="checkbox-item"><input type="checkbox" id="personalization" checked><label for="personalization">Personalization Cookies</label></div>
+                <div class="checkbox-item"><input type="checkbox" id="advertising" checked><label for="advertising">Advertising Cookies</label></div>
+            </div>
+            <div class="button-group">
+                <button class="btn-allow" onclick="handleChoice('accept')">Allow all</button>
+                <button class="btn-reject" onclick="showRejectOptions()">Reject</button>
+            </div>
+            <button class="btn-confirm" id="confirmBtn" onclick="handleChoice('reject-confirmed')">Confirm my choices</button>
+        </div>
+    </div>
+    
+    <!-- Ads Consequence Overlay -->
+    <div class="ads-overlay" id="adsOverlay">
+        <div class="ads-container">
+            <div class="ads-header">
+                <h2>⚠️ Oh No! You Accepted Cookies!</h2>
+            </div>
+            
+            <div class="warning-box">
+                <p><strong>Look what happened!</strong> Now the website is tracking your behavior and showing you targeted ads based on your browsing history. This is what happens when you click "Accept all" without protecting your privacy!</p>
+            </div>
+            
+            <div class="fake-ads">
+                <div class="fake-ad">
+                    <div class="ad-emoji">🏃</div>
+                    <div class="ad-title">RUNNING SHOES!</div>
+                    <div class="ad-text">We saw you searched for running shoes! BUY NOW - 50% OFF!</div>
+                </div>
+                <div class="fake-ad">
+                    <div class="ad-emoji">❤️</div>
+                    <div class="ad-title">DATING NEAR YOU</div>
+                    <div class="ad-text">Based on your location & interests! CLICK HERE!</div>
+                </div>
+                <div class="fake-ad">
+                    <div class="ad-emoji">🎮</div>
+                    <div class="ad-title">VIDEO GAMES</div>
+                    <div class="ad-text">You viewed gaming products! LIMITED TIME OFFER!</div>
+                </div>
+                <div class="fake-ad">
+                    <div class="ad-emoji">💊</div>
+                    <div class="ad-title">HEALTH PRODUCTS</div>
+                    <div class="ad-text">Based on your browsing! Special discount for YOU!</div>
+                </div>
+            </div>
+            
+            <div class="ads-actions">
+                <button class="btn-try-again" onclick="tryAgain()">Try Again</button>
+                <button class="btn-continue-anyway" onclick="continueAnyway()">Continue Anyway</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function startExperience() {
+            document.getElementById('introAlert').style.display = 'none';
+            document.getElementById('websiteContainer').classList.add('active');
+            setTimeout(() => { 
+                document.getElementById('cookieOverlay').classList.add('active'); 
+            }, 1000);
+        }
+        
+        function showRejectOptions() {
+            document.getElementById('cookieOptions').classList.add('active');
+            document.getElementById('confirmBtn').classList.add('active');
+            // Notify parent of interaction
+            notifyInteraction();
+        }
+        
+        function handleChoice(choice) {
+            // Notify parent of interaction
+            notifyInteraction();
+            
+            if (choice === 'accept') {
+                // Show ads consequence!
+                document.getElementById('cookieOverlay').classList.remove('active');
+                document.getElementById('adsOverlay').classList.add('active');
+                return;
+            }
+            
+            // Handle reject-confirmed
+            document.getElementById('cookieOverlay').classList.remove('active');
+            document.getElementById('websiteContainer').style.display = 'none';
+            const successIcon = document.getElementById('successIcon');
+            const successTitle = document.getElementById('successTitle');
+            const successText = document.getElementById('successText');
+            
+            const all = document.getElementById('analytics').checked && 
+                       document.getElementById('personalization').checked && 
+                       document.getElementById('advertising').checked;
+            const none = !document.getElementById('analytics').checked && 
+                        !document.getElementById('personalization').checked && 
+                        !document.getElementById('advertising').checked;
+            
+            if (all) {
+                successIcon.textContent = '😅';
+                successTitle.textContent = 'Oops! Still Accepted All';
+                successText.innerHTML = 'You clicked <span class="highlight">"Reject"</span> but left all checked! Uncheck the boxes first.';
+            } else if (none) {
+                successIcon.textContent = '🎉';
+                successTitle.textContent = 'Perfect!';
+                successText.innerHTML = 'You rejected all cookies! Notice how <span class="highlight">"Reject"</span> required multiple steps.';
+            } else {
+                successIcon.textContent = '👍';
+                successTitle.textContent = 'Good Job!';
+                successText.innerHTML = 'You rejected some cookies!';
+            }
+            
+            document.getElementById('successMessage').classList.add('active');
+        }
+        
+        function tryAgain() {
+            // Reset and try again
+            document.getElementById('adsOverlay').classList.remove('active');
+            document.getElementById('websiteContainer').style.display = 'block';
+            document.getElementById('cookieOverlay').classList.add('active');
+            
+            // Reset checkboxes
+            document.getElementById('analytics').checked = true;
+            document.getElementById('personalization').checked = true;
+            document.getElementById('advertising').checked = true;
+            document.getElementById('cookieOptions').classList.remove('active');
+            document.getElementById('confirmBtn').classList.remove('active');
+        }
+        
+        function continueAnyway() {
+            // Continue despite accepting cookies
+            document.getElementById('adsOverlay').classList.remove('active');
+            document.getElementById('websiteContainer').style.display = 'none';
+            
+            const successIcon = document.getElementById('successIcon');
+            const successTitle = document.getElementById('successTitle');
+            const successText = document.getElementById('successText');
+            
+            successIcon.textContent = '📝';
+            successTitle.textContent = 'You Accepted All Cookies';
+            successText.innerHTML = 'You clicked <span class="highlight">"Allow all"</span>. The website can now track everything you do online!';
+            
+            document.getElementById('successMessage').classList.add('active');
+        }
+        
+        function notifyInteraction() {
+            // Notify parent that user interacted
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'user_interacted' }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

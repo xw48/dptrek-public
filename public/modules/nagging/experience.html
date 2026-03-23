@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Shopping Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* Shopping Site */
+        .shopping-site {
+            min-height: 100vh;
+            background: white;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 50px;
+            color: white;
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        /* Products Grid */
+        .products-section {
+            padding: 40px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .product-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+        .product-image {
+            background: #f9fafb;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+        }
+        .product-info {
+            padding: 20px;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .product-rating {
+            color: #fbbf24;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Overlay */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .popup-overlay.active {
+            display: block;
+        }
+
+        /* Notification Popup — always centered */
+        .notification-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+        .notification-popup.active {
+            display: block;
+        }
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* Popup close (✕) button */
+        .popup-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #9ca3af;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .popup-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-right: 28px;
+        }
+        .popup-icon {
+            font-size: 32px;
+        }
+        .popup-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .popup-message {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .popup-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .popup-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-allow {
+            background: #667eea;
+            color: white;
+        }
+        .btn-allow:hover {
+            background: #5568d3;
+        }
+        .btn-not-now {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-not-now:hover {
+            background: #d1d5db;
+        }
+
+        /* Spam Notifications */
+        .spam-notifications {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1001;
+            max-width: 350px;
+        }
+        .spam-notifications.active {
+            display: block;
+        }
+        .spam-alert {
+            background: white;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .spam-alert-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        .spam-alert-message {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Shopping Site -->
+    <div class="shopping-site">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="logo">ABC Shopping Store</div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Electronics</a>
+                    <a href="#" class="nav-link">Fashion</a>
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">Deals</a>
+                </div>
+                <div class="nav-icons">
+                    <span>🔍</span>
+                    <span>🛒</span>
+                    <span>👤</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="products-section">
+            <h1 class="section-title">Trending Now</h1>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">📱</div>
+                    <div class="product-info">
+                        <div class="product-name">Smartphone Pro Max</div>
+                        <div class="product-rating">⭐⭐⭐⭐⭐ 4.8</div>
+                        <div class="product-price">$899</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">💻</div>
+                    <div class="product-info">
+                        <div class="product-name">Laptop Ultra</div>
+                        <div class="product-rating">⭐⭐⭐⭐ 4.6</div>
+                        <div class="product-price">$1,299</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <div class="product-name">Wireless Headphones</div>
+                        <div class="product-rating">⭐⭐⭐⭐⭐ 4.9</div>
+                        <div class="product-price">$249</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">⌚</div>
+                    <div class="product-info">
+                        <div class="product-name">Smart Watch</div>
+                        <div class="product-rating">⭐⭐⭐⭐ 4.7</div>
+                        <div class="product-price">$399</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+
+    <!-- Single Centered Notification Popup (reused for all nags) -->
+    <div class="notification-popup" id="notificationPopup">
+        <button class="popup-close" onclick="handleDismiss()" aria-label="Close">✕</button>
+        <div class="popup-header">
+            <span class="popup-icon" id="popupIcon">🔔</span>
+            <h2 class="popup-title" id="popupTitle">ABC Shopping Store</h2>
+        </div>
+        <p class="popup-message" id="popupMessage">Would like to send you notifications about new deals, exclusive offers, and special promotions!</p>
+        <div class="popup-buttons">
+            <button class="popup-btn btn-allow" onclick="handleAllow()" id="btnAllow">Allow</button>
+            <button class="popup-btn btn-not-now" onclick="handleDismiss()" id="btnDismiss">Not Now</button>
+        </div>
+    </div>
+
+    <!-- Spam Notifications (shown if user clicks Allow) -->
+    <div class="spam-notifications" id="spamNotifications">
+        <div class="spam-alert">
+            <div class="spam-alert-title">🔥 FLASH SALE!</div>
+            <div class="spam-alert-message">50% off on all electronics! Limited time only!</div>
+        </div>
+        <div class="spam-alert">
+            <div class="spam-alert-title">⚡ DON'T MISS OUT!</div>
+            <div class="spam-alert-message">Free shipping on orders over $50! Shop now!</div>
+        </div>
+        <div class="spam-alert">
+            <div class="spam-alert-title">🎁 SPECIAL FOR YOU!</div>
+            <div class="spam-alert-message">Exclusive member discount - 20% extra off!</div>
+        </div>
+    </div>
+
+    <script>
+        let nagCount = 0;
+        const MAX_NAGS = 4;
+
+        // Each nag has slightly different wording but same popup style
+        const nags = [
+            {
+                icon: "🔔",
+                title: "ABC Shopping Store",
+                message: "Would like to send you notifications about new deals, exclusive offers, and special promotions!",
+                allow: "Allow",
+                dismiss: "Not Now"
+            },
+            {
+                icon: "🔔",
+                title: "Stay Updated!",
+                message: "You might miss our best deals! Allow notifications to get real-time alerts on flash sales and discounts.",
+                allow: "Allow",
+                dismiss: "Not Now"
+            },
+            {
+                icon: "📢",
+                title: "Don't Miss Out!",
+                message: "Over 2 million shoppers get our deal alerts. Turn on notifications so you never miss a price drop!",
+                allow: "Turn On",
+                dismiss: "No Thanks"
+            },
+            {
+                icon: "⚡",
+                title: "Are You Sure?",
+                message: "This is your last chance to enable notifications. You could miss savings of up to 70% off!",
+                allow: "Yes, Allow",
+                dismiss: "No Thanks"
+            }
+        ];
+
+        // Show first popup after 2 seconds
+        setTimeout(() => {
+            showPopup();
+        }, 2000);
+
+        function showPopup() {
+            const nag = nags[nagCount];
+            document.getElementById('popupIcon').textContent = nag.icon;
+            document.getElementById('popupTitle').textContent = nag.title;
+            document.getElementById('popupMessage').textContent = nag.message;
+            document.getElementById('btnAllow').textContent = nag.allow;
+            document.getElementById('btnDismiss').textContent = nag.dismiss;
+
+            document.getElementById('notificationPopup').classList.add('active');
+            document.getElementById('popupOverlay').classList.add('active');
+        }
+
+        function hidePopup() {
+            document.getElementById('notificationPopup').classList.remove('active');
+            document.getElementById('popupOverlay').classList.remove('active');
+        }
+
+        function handleDismiss() {
+            nagCount++;
+            hidePopup();
+
+            if (nagCount < MAX_NAGS) {
+                // Show same-style popup again after short delay
+                setTimeout(() => {
+                    showPopup();
+                }, 1000);
+            } else {
+                // User dismissed all — they resisted
+                notifyComplete('declined');
+            }
+        }
+
+        function handleAllow() {
+            hidePopup();
+
+            // Show spam notifications
+            setTimeout(() => {
+                document.getElementById('spamNotifications').classList.add('active');
+            }, 500);
+
+            // Notify after spam appears
+            setTimeout(() => {
+                notifyComplete('accepted');
+            }, 2000);
+        }
+
+        function notifyComplete(result) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Interference Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+
+        /* Intro */
+        .intro-screen {
+            display: flex; position: fixed; inset: 0;
+            background: rgba(15,23,42,0.9); align-items: center; justify-content: center; z-index: 3000;
+        }
+        .intro-box { background: white; border-radius: 16px; padding: 36px; max-width: 500px; text-align: center; }
+        .intro-box h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: #1e293b; }
+        .intro-box p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 20px; }
+        .intro-btn { background: #3b82f6; color: white; padding: 14px 36px; font-size: 16px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; }
+
+        /* Scenario container */
+        .scenario { display: none; min-height: 100vh; position: relative; }
+        .scenario.active { display: block; }
+
+        /* ===== SCENARIO 1: Shoe Store ===== */
+        .shoe-store { background: #fafafa; }
+        .shoe-nav { background: #1a1a1a; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .shoe-logo { color: white; font-size: 20px; font-weight: 800; letter-spacing: 2px; }
+        .shoe-hero { position: relative; height: 500px; overflow: hidden; }
+        .shoe-hero-bg {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #f5f0eb 0%, #e8ddd4 100%);
+            display: flex; align-items: center; justify-content: center; font-size: 200px;
+            filter: brightness(0.95);
+        }
+
+        /* Data consent popup */
+        .consent-popup {
+            position: absolute; top: 20px; left: 20px;
+            background: white; border-radius: 10px; padding: 24px;
+            max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        .consent-popup h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: #1a1a1a; }
+        .consent-popup p { font-size: 13px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+        .consent-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .consent-row input { width: 18px; height: 18px; accent-color: #3b82f6; }
+        .consent-row label { font-size: 14px; color: #374151; }
+        .consent-btn { padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; background: white; }
+
+        /* ===== SCENARIO 2: Travel/Beach Site ===== */
+        .travel-site { background: #fafafa; }
+        .travel-hero {
+            height: 100vh; position: relative;
+            background: linear-gradient(135deg, #87ceeb 0%, #e0f2fe 50%, #fef3c7 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .travel-bg-emoji { font-size: 200px; opacity: 0.3; position: absolute; }
+
+        /* Cookie popup */
+        .cookie-popup {
+            position: relative; z-index: 10;
+            background: white; border-radius: 12px; padding: 28px;
+            max-width: 440px; width: 90%; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .cookie-popup h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; text-align: center; }
+        .cookie-popup > p { font-size: 13px; color: #666; margin-bottom: 18px; line-height: 1.5; text-align: center; }
+        .cookie-option { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+        .cookie-option input { width: 18px; height: 18px; accent-color: #3b82f6; }
+        .cookie-option label { font-size: 14px; color: #374151; font-weight: 500; }
+        .cookie-option .essential { color: #9ca3af; font-size: 12px; }
+        .cookie-btns { display: flex; gap: 10px; margin-top: 18px; }
+        .cookie-btn {
+            flex: 1; padding: 12px; font-size: 14px; font-weight: 600;
+            border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .cookie-accept { background: #3b82f6; color: white; }
+        .cookie-submit { background: #f3f4f6; color: #374151; }
+
+        /* Transition modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 2000; }
+        .modal.active { display: flex; }
+        .modal-box { background: white; border-radius: 16px; padding: 36px; text-align: center; max-width: 460px; width: 90%; }
+        .modal-box h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .modal-box p { font-size: 14px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+        .feedback-badge { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+        .pass { background: #f0fdf4; color: #16a34a; }
+        .fail { background: #fef2f2; color: #ef4444; }
+        .modal-btn { background: #3b82f6; color: white; padding: 12px 32px; font-size: 15px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* Complete */
+        .complete-score { font-size: 42px; font-weight: 900; margin: 12px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- INTRO -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-box">
+            <div style="font-size:48px;margin-bottom:12px;">🎯</div>
+            <h2>Test Your Knowledge</h2>
+            <p>You'll see 2 websites with pre-selected options. Your goal: find and uncheck the options that aren't in your best interest!</p>
+            <button class="intro-btn" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+
+    <!-- SCENARIO 1: Shoe Store — Data Usage Consent -->
+    <div class="scenario shoe-store" id="scenario1">
+        <nav class="shoe-nav">
+            <div class="shoe-logo">PRØDUCTS</div>
+        </nav>
+        <div class="shoe-hero">
+            <div class="shoe-hero-bg">👟</div>
+            <div class="consent-popup">
+                <h3>Data Usage Consent</h3>
+                <p>We use your data for shopping to improve our services.</p>
+                <div class="consent-row">
+                    <input type="checkbox" id="dataConsent" checked>
+                    <label for="dataConsent">Agree of data usage</label>
+                </div>
+                <button class="consent-btn" onclick="handleS1Submit()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCENARIO 2: Travel Site — Cookie Settings -->
+    <div class="scenario travel-site" id="scenario2">
+        <div class="travel-hero">
+            <div class="travel-bg-emoji" style="top:20%;left:10%;">🌴</div>
+            <div class="travel-bg-emoji" style="top:60%;right:10%;">🏖️</div>
+            <div class="cookie-popup">
+                <h3>Cookie Settings</h3>
+                <p>We use cookies to enhance your experience. Please review and adjust your cookie settings below.</p>
+                <div class="cookie-option">
+                    <input type="checkbox" id="essentialCookies" checked disabled>
+                    <label for="essentialCookies">Essential Cookies <span class="essential">(required)</span></label>
+                </div>
+                <div class="cookie-option">
+                    <input type="checkbox" id="analyticsCookies" checked>
+                    <label for="analyticsCookies">Analytics Cookies</label>
+                </div>
+                <div class="cookie-option">
+                    <input type="checkbox" id="marketingCookies" checked>
+                    <label for="marketingCookies">Marketing Cookies</label>
+                </div>
+                <div class="cookie-btns">
+                    <button class="cookie-btn cookie-accept" onclick="handleS2AcceptAll()">Accept All</button>
+                    <button class="cookie-btn cookie-submit" onclick="handleS2Submit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transition Modal -->
+    <div class="modal" id="transitionModal">
+        <div class="modal-box">
+            <div style="font-size:48px;margin-bottom:12px;" id="transEmoji"></div>
+            <h2 id="transTitle"></h2>
+            <div class="feedback-badge" id="transBadge"></div>
+            <p id="transText"></p>
+            <button class="modal-btn" onclick="goNext()" id="transBtn">Next Scenario →</button>
+        </div>
+    </div>
+
+    <!-- Complete Modal -->
+    <div class="modal" id="completeModal">
+        <div class="modal-box">
+            <div style="font-size:48px;margin-bottom:12px;" id="finalEmoji"></div>
+            <h2 id="finalTitle"></h2>
+            <div class="complete-score" id="finalScore"></div>
+            <p id="finalText"></p>
+            <button class="modal-btn" onclick="finishTest()">Finish</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+
+        function startTest() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('scenario1').classList.add('active');
+        }
+
+        // SCENARIO 1: Data consent
+        function handleS1Submit() {
+            const consented = document.getElementById('dataConsent').checked;
+            if (!consented) {
+                score++;
+                showTransition('✅', 'Scenario 1 Complete', 'You unchecked it!', 'pass',
+                    'Great job! You noticed the pre-checked "Agree of data usage" and unchecked it before submitting.');
+            } else {
+                showTransition('⚠️', 'Scenario 1 Complete', 'You left it checked', 'fail',
+                    'You submitted with "Agree of data usage" still checked. This means the website can use your data. Always look for pre-checked boxes before clicking Submit.');
+            }
+        }
+
+        // SCENARIO 2: Cookie settings
+        function handleS2AcceptAll() {
+            showTransition('⚠️', 'Scenario 2 Complete', 'You accepted all cookies', 'fail',
+                'You clicked "Accept All" which enables Analytics and Marketing cookies. Instead, you should uncheck the non-essential cookies and click "Submit".');
+        }
+
+        function handleS2Submit() {
+            const analytics = document.getElementById('analyticsCookies').checked;
+            const marketing = document.getElementById('marketingCookies').checked;
+
+            if (!analytics && !marketing) {
+                score++;
+                showTransition('✅', 'Scenario 2 Complete', 'You unchecked both!', 'pass',
+                    'Excellent! You unchecked both Analytics and Marketing cookies, keeping only the essential ones.');
+            } else if (!analytics || !marketing) {
+                // Partial — give credit
+                score++;
+                showTransition('👍', 'Scenario 2 Complete', 'Partially correct', 'pass',
+                    'You unchecked one of the non-essential cookies. Ideally, uncheck both Analytics and Marketing cookies to protect your privacy.');
+            } else {
+                showTransition('⚠️', 'Scenario 2 Complete', 'Both still checked', 'fail',
+                    'You submitted with Analytics and Marketing cookies still checked. These allow the website to track your behavior and show targeted ads.');
+            }
+        }
+
+        function showTransition(emoji, title, badge, badgeType, text) {
+            document.getElementById('transEmoji').textContent = emoji;
+            document.getElementById('transTitle').textContent = title;
+            document.getElementById('transBadge').textContent = badge;
+            document.getElementById('transBadge').className = 'feedback-badge ' + badgeType;
+            document.getElementById('transText').textContent = text;
+
+            // Change button text based on whether this is the last scenario
+            const isLast = document.getElementById('scenario2').classList.contains('active');
+            document.getElementById('transBtn').textContent = isLast ? 'See Results' : 'Next Scenario →';
+
+            document.getElementById('transitionModal').classList.add('active');
+        }
+
+        function goNext() {
+            document.getElementById('transitionModal').classList.remove('active');
+
+            if (document.getElementById('scenario1').classList.contains('active')) {
+                document.getElementById('scenario1').classList.remove('active');
+                document.getElementById('scenario2').classList.add('active');
+            } else {
+                showComplete();
+            }
+        }
+
+        function showComplete() {
+            const passed = score >= 2;
+            document.getElementById('finalEmoji').textContent = passed ? '🎉' : '💪';
+            document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
+            document.getElementById('finalScore').textContent = score + ' / 2';
+            document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
+            document.getElementById('finalText').textContent = passed
+                ? 'You successfully identified pre-selected options in both scenarios! You now know how to spot Interface Interference.'
+                : 'Keep practicing! Always look for pre-checked boxes and read every option before clicking Submit or Accept.';
+            document.getElementById('completeModal').classList.add('active');
+        }
+
+        function finishTest() {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'test-complete',
+                    score: score,
+                    total: 2,
+                    passed: score >= 2
+                }, '*');
+            }
+        }
+    </script>
+</body>
+</html>
