@@ -1,13 +1,15 @@
 import { useMemo, useState, useEffect } from "react";
 import { CheckCircle2, Play, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 // PostHog Analytics
 import { trackHomePageLoad, trackTextSizeChange, trackModuleClick } from "../posthog";
 
 // Supabase Database
-import { saveFeedback, initSession } from "../supabaseClient";
+import { saveFeedback } from "../supabaseClient";
+
+// Centralized state
+import { useAppContext } from "../AppContext";
 
 const MODULES = [
   { id: 1, title: "Obstruction", description: "Learn how websites make it hard for you to cancel subscriptions or delete your account." },
@@ -65,95 +67,31 @@ function Card({ children, className = "" }) {
 }
 
 export default function Home() {
-  // Load progress from cookies on initial mount
-  const [completedModules, setCompletedModules] = useState(() => {
-    const savedProgress = Cookies.get('dptrek_progress');
-    return savedProgress ? JSON.parse(savedProgress) : [];
-  });
+  const {
+    textSize, setTextSize,
+    highContrast, setHighContrast,
+    completedModules, toggleComplete,
+    textSizeScale,
+  } = useAppContext();
   
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [textSize, setTextSize] = useState(() => {
-    // Load text size from cookies on initial mount
-    const savedSize = Cookies.get('dptrek_textsize');
-    return savedSize || "medium";
-  });
   const [showWelcomeHelper, setShowWelcomeHelper] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
-  const [highContrast, setHighContrast] = useState(() => {
-    return Cookies.get('dptrek_contrast') === 'high';
-  });
 
   const navigate = useNavigate();
 
   // Track home page load
   useEffect(() => {
     trackHomePageLoad();
-    initSession(textSize);
   }, []);
-
-  // Save progress to cookies whenever it changes
-  useEffect(() => {
-    Cookies.set('dptrek_progress', JSON.stringify(completedModules), { expires: 365 });
-  }, [completedModules]);
-
-  // Save text size to cookies whenever it changes
-  useEffect(() => {
-    Cookies.set('dptrek_textsize', textSize, { expires: 365 });
-  }, [textSize]);
-
-  // Save contrast preference and toggle body class
-  useEffect(() => {
-    Cookies.set('dptrek_contrast', highContrast ? 'high' : 'normal', { expires: 365 });
-    if (highContrast) {
-      document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
-    }
-  }, [highContrast]);
 
   const progressPercent = useMemo(
     () => (completedModules.length / MODULES.length) * 100,
     [completedModules.length]
   );
-
-  const textSizeScale = useMemo(() => {
-    const scales = {
-      small: {
-        base: 'text-sm',
-        heading: 'text-3xl md:text-4xl',
-        subheading: 'text-xl md:text-2xl',
-        cardTitle: 'text-xl',
-        cardText: 'text-base',
-        sectionTitle: 'text-2xl'
-      },
-      medium: {
-        base: 'text-base',
-        heading: 'text-4xl md:text-5xl',
-        subheading: 'text-xl md:text-2xl',
-        cardTitle: 'text-2xl',
-        cardText: 'text-lg',
-        sectionTitle: 'text-3xl'
-      },
-      large: {
-        base: 'text-lg',
-        heading: 'text-5xl md:text-6xl',
-        subheading: 'text-2xl md:text-3xl',
-        cardTitle: 'text-3xl',
-        cardText: 'text-xl',
-        sectionTitle: 'text-4xl'
-      }
-    };
-    return scales[textSize] || scales.medium;
-  }, [textSize]);
-
-  const toggleComplete = (id) => {
-    setCompletedModules((prev) =>
-      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
-    );
-  };
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
@@ -202,7 +140,7 @@ export default function Home() {
       <div className="bg-white border-b-2 border-gray-200 shadow-sm">
         <div className="mx-auto max-w-full px-8">
           {/* Desktop Layout */}
-          <div className="hidden lg:flex items-center justify-between py-4 gap-8">
+          <div className="hidden xl:flex items-center justify-between py-4 gap-6">
             {/* Menu Button + Logo */}
             <div className="flex items-center gap-4 flex-shrink-0">
               <button
@@ -220,17 +158,17 @@ export default function Home() {
             </div>
 
             {/* Progress Bar - Takes up remaining space */}
-            <div className="flex-1 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl px-8 py-3.5 border border-purple-200">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-base font-bold text-gray-900">Your Learning Progress</span>
-                  <span className="px-3 py-1 bg-white border border-purple-200 text-purple-700 text-sm font-bold rounded-lg shadow-sm">
+            <div className="flex-1 min-w-0 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl px-6 py-3.5 border border-purple-200">
+              <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                <span className="text-sm font-bold text-gray-900 whitespace-nowrap">Your Learning Progress</span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="px-2 py-0.5 bg-white border border-purple-200 text-purple-700 text-sm font-bold rounded-lg shadow-sm whitespace-nowrap">
                     {Math.round(progressPercent)}% Complete
                   </span>
+                  <span className="text-sm font-bold text-purple-700 whitespace-nowrap">
+                    {completedModules.length}/{MODULES.length} modules
+                  </span>
                 </div>
-                <span className="text-base font-bold text-purple-700">
-                  {completedModules.length} of {MODULES.length} modules completed
-                </span>
               </div>
               <ProgressBar value={progressPercent} />
             </div>
@@ -297,7 +235,7 @@ export default function Home() {
           </div>
 
           {/* Mobile/Tablet Layout */}
-          <div className="lg:hidden space-y-4 py-4">
+          <div className="xl:hidden space-y-4 py-4">
             {/* Top Row: Menu, Logo and Resume Button */}
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">

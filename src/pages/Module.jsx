@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import {
   Search, Lightbulb, BookOpen, FlaskConical, PenLine,
   ChevronLeft, ChevronRight, CheckCircle2, XCircle, Home
 } from "lucide-react";
+
+// Centralized state
+import { useAppContext } from "../AppContext";
 
 // PostHog Analytics
 import {
@@ -1100,48 +1102,11 @@ export default function Module() {
   const navigate = useNavigate();
   const config = MODULE_CONFIGS[Number(id)];
 
+  const { textSize, setTextSize, textSizeScale } = useAppContext();
+
   const [currentPhase, setCurrentPhase] = useState("experience");
   const [unlockedPhases, setUnlockedPhases] = useState(["experience"]);
   const [moduleCompleted, setModuleCompleted] = useState(false);
-
-  // Load text size from cookies
-  const [textSize, setTextSize] = useState(() => {
-    const savedSize = Cookies.get('dptrek_textsize');
-    return savedSize || "medium";
-  });
-
-  // Text size scaling (same as Home.jsx)
-  const textSizeScale = useMemo(() => {
-    const scales = {
-      small: {
-        base: 'text-sm',
-        large: 'text-base',
-        xl: 'text-lg',
-        '2xl': 'text-xl',
-        '3xl': 'text-2xl',
-      },
-      medium: {
-        base: 'text-base',
-        large: 'text-lg',
-        xl: 'text-xl',
-        '2xl': 'text-2xl',
-        '3xl': 'text-3xl',
-      },
-      large: {
-        base: 'text-lg',
-        large: 'text-xl',
-        xl: 'text-2xl',
-        '2xl': 'text-3xl',
-        '3xl': 'text-4xl',
-      }
-    };
-    return scales[textSize] || scales.medium;
-  }, [textSize]);
-
-  // Save text size when it changes
-  useEffect(() => {
-    Cookies.set('dptrek_textsize', textSize, { expires: 365 });
-  }, [textSize]);
 
   if (!config) {
     return (

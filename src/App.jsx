@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { initPostHog } from './posthog';
+import { AppProvider } from './AppContext';
 import Home from './pages/Home';
 import Module from './pages/Module';
 
@@ -11,12 +12,14 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/module/:id" element={<Module />} />
-      </Routes>
-    </Router>
+    <AppProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/module/:id" element={<Module />} />
+        </Routes>
+      </Router>
+    </AppProvider>
   );
 }
 
