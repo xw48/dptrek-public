@@ -555,77 +555,79 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t-2 border-gray-200 shadow-sm">
-        <div className="mx-auto max-w-full px-8 py-12">
-          {/* Main Footer Content */}
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            {/* Brand Section */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="px-8 pt-10 pb-6">
+
+          {/* Assessment CTA Banner */}
+          <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 mb-12 overflow-hidden">
+            <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '32px 32px'}} />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-1">Ready to Test Your Knowledge?</h3>
+                <p className="text-purple-100 text-base">Complete all modules and take our assessment!</p>
+              </div>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="bg-white hover:bg-purple-50 text-purple-700 font-bold shadow-lg whitespace-nowrap px-8 shrink-0"
+                aria-label="Take the After-Learning Assessment Survey"
+              >
+                🎯 Take Assessment Survey
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Footer Columns */}
+          <div className="grid md:grid-cols-[2fr_1fr_1fr] gap-10 mb-10">
+
+            {/* Brand */}
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 flex items-center justify-center shadow-md">
-                  <span className="text-2xl">🛡️</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-md">
+                  <span className="text-xl">🛡️</span>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-gray-900">DP Trek</div>
-                  <div className="text-sm text-gray-600">Stay Safe Online</div>
+                  <div className="text-base font-bold text-gray-900">DP Trek</div>
+                  <div className="text-xs text-purple-500 font-semibold uppercase tracking-wide">Stay Safe Online</div>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
                 Learn to recognize and avoid online tricks. Empower yourself with knowledge for safer internet browsing.
               </p>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-base font-bold text-gray-900 mb-4">Quick Links</h3>
-              <div className="space-y-3">
-                <Button variant="link" className="text-base block" aria-label="Frequently Asked Questions">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Quick Links</h3>
+              <div className="flex flex-col gap-3">
+                <button className="text-sm text-gray-600 hover:text-purple-600 transition-colors text-left">
                   ❓ Frequently Asked Questions
-                </Button>
-                <Button variant="link" className="text-base block" aria-label="Share with family" onClick={handleShare}>
-                  👨‍👩‍👧‍👦 Share
-                </Button>
+                </button>
+                <button className="text-sm text-gray-600 hover:text-purple-600 transition-colors text-left" onClick={handleShare}>
+                  👨‍👩‍👧‍👦 Share with Family
+                </button>
               </div>
             </div>
 
-            {/* Contact Us */}
+            {/* Need Help */}
             <div>
-              <h3 className="text-base font-bold text-gray-900 mb-4">Contact Us</h3>
-              <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                <p className="text-sm text-gray-700 mb-3">
-                  Having trouble? Don't hesitate to ask someone you trust for help.
-                </p>
-                <Button variant="primary" size="md" className="w-full" aria-label="Get help">
-                  📞 Get Help
-                </Button>
-              </div>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Need Help?</h3>
+              <p className="text-sm text-gray-500 leading-relaxed mb-4">
+                Unsure about something? Ask a family member or someone you trust.
+              </p>
+              <button className="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold transition-colors">
+                📞 Get Help
+              </button>
             </div>
-          </div>
 
-          {/* Assessment Survey CTA */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-center shadow-lg mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">
-              Ready to Test Your Knowledge?
-            </h3>
-            <p className="text-purple-100 mb-4 text-lg">
-              Complete all modules and take our assessment to see how much you've learned!
-            </p>
-            <Button 
-              variant="secondary" 
-              size="lg" 
-              className="bg-white hover:bg-gray-100 text-purple-700 font-bold"
-              aria-label="Take the After-Learning Assessment Survey"
-            >
-              🎯 Take Assessment Survey
-            </Button>
           </div>
 
           {/* Bottom Bar */}
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
-              © 2026 Dark Patterns Education • Helping older adults stay safe online
-            </p>
+          <div className="border-t border-gray-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-sm text-gray-400">© 2026 Dark Patterns Education</p>
+            <p className="text-sm text-gray-400">Helping older adults stay safe online</p>
           </div>
+
         </div>
       </footer>
 
