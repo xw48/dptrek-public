@@ -54,15 +54,15 @@ function PhaseTab({ phase, isActive, isUnlocked, onClick }) {
     <button
       onClick={() => isUnlocked && onClick(phase)}
       disabled={!isUnlocked}
-      className={`flex flex-col items-center gap-1 px-4 py-3 rounded-xl text-xs font-bold transition-all
+      className={`flex flex-col items-center gap-0.5 px-5 py-2 rounded-xl text-xs font-bold transition-all
         ${isActive
-          ? "bg-purple-600 text-white shadow-md scale-105"
+          ? "bg-purple-600 text-white shadow-md"
           : isUnlocked
             ? "bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-700 border border-gray-200"
             : "bg-gray-100 text-gray-300 cursor-not-allowed border border-gray-100"
         }`}
     >
-      <Icon className="w-5 h-5" />
+      <Icon className="w-4 h-4" />
       <span>{label}</span>
     </button>
   );
@@ -1173,19 +1173,19 @@ export default function Module() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b-2 border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 text-gray-500 hover:text-purple-700 font-semibold transition flex-shrink-0">
-            <ChevronLeft className="w-5 h-5" />
-            <img 
-              src="/DPTrek_logo.png" 
-              alt="DP Trek" 
-              className="h-10 w-auto"
-            />
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+        <div className="px-6 py-3 flex items-center justify-between gap-4">
+
+          {/* Left: Home */}
+          <Link to="/" className="flex items-center gap-1.5 text-gray-500 hover:text-purple-700 font-semibold transition flex-shrink-0">
+            <ChevronLeft className="w-4 h-4" />
+            <img src="/DPTrek_logo.png" alt="DP Trek" className="h-8 w-auto" />
           </Link>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+
+          {/* Center: Phase tabs */}
+          <div className="flex items-center gap-1.5 flex-1 justify-center">
             {PHASES.map((phase, i) => (
-              <div key={phase} className="flex items-center gap-2 flex-shrink-0">
+              <div key={phase} className="flex items-center gap-1.5">
                 <PhaseTab
                   phase={phase}
                   isActive={currentPhase === phase}
@@ -1193,44 +1193,31 @@ export default function Module() {
                   onClick={setCurrentPhase}
                 />
                 {i < PHASES.length - 1 && (
-                  <div className={`w-6 h-0.5 flex-shrink-0 ${unlockedPhases.includes(PHASES[i + 1]) ? "bg-purple-300" : "bg-gray-200"}`} />
+                  <div className={`w-6 h-0.5 ${unlockedPhases.includes(PHASES[i + 1]) ? "bg-purple-300" : "bg-gray-200"}`} />
                 )}
               </div>
             ))}
           </div>
-          
-          {/* Text Size Controls */}
-          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-            <span className="text-xs font-semibold text-gray-500">Size:</span>
-            <button
-              onClick={() => setTextSize("small")}
-              className={`w-8 h-8 rounded-lg text-sm font-bold transition ${
-                textSize === "small" ? "bg-purple-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              A
-            </button>
-            <button
-              onClick={() => setTextSize("medium")}
-              className={`w-8 h-8 rounded-lg text-base font-bold transition ${
-                textSize === "medium" ? "bg-purple-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              A
-            </button>
-            <button
-              onClick={() => setTextSize("large")}
-              className={`w-8 h-8 rounded-lg text-lg font-bold transition ${
-                textSize === "large" ? "bg-purple-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              A
-            </button>
+
+          {/* Right: Text size + progress */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-1">
+              <span className="text-xs font-semibold text-gray-400 mr-1">Size:</span>
+              {[["small","text-sm"],["medium","text-base"],["large","text-lg"]].map(([size, cls]) => (
+                <button
+                  key={size}
+                  onClick={() => setTextSize(size)}
+                  className={`w-7 h-7 rounded-lg ${cls} font-bold transition ${
+                    textSize === size ? "bg-purple-600 text-white shadow" : "bg-gray-100 text-gray-600 hover:bg-purple-50 hover:text-purple-700"
+                  }`}
+                >A</button>
+              ))}
+            </div>
+            <div className="text-xs font-semibold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
+              {currentIndex + 1} / {PHASES.length}
+            </div>
           </div>
-          
-          <div className={`${textSizeScale.base} font-semibold text-gray-500 flex-shrink-0`}>
-            {currentIndex + 1} / {PHASES.length}
-          </div>
+
         </div>
       </div>
 
