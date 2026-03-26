@@ -14,7 +14,7 @@ export const initPostHog = () => {
         },
         capture_pageview: true, // Automatically capture page views
         capture_pageleave: true, // Track when users leave
-        autocapture: false, // Disable automatic event capture (we'll track manually)
+        autocapture: true, // Disable automatic event capture (we'll track manually)
         persistence: 'localStorage', // Store data in localStorage
         disable_session_recording: true,
       }
