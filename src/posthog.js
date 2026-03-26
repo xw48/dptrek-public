@@ -16,7 +16,7 @@ export const initPostHog = () => {
         capture_pageleave: true, // Track when users leave
         autocapture: false, // Disable automatic event capture (we'll track manually)
         persistence: 'localStorage', // Store data in localStorage
-        disable_session_recording: false, // Enable session recordings (optional)
+        disable_session_recording: true,
       }
     );
   }
@@ -80,6 +80,15 @@ export const trackInteractiveExampleStep = (moduleId, moduleName, exampleName, s
     example_name: exampleName,
     step: step,
     total_steps: totalSteps,
+  });
+};
+
+export const trackPhaseTime = (moduleId, moduleName, phaseName, durationSeconds) => {
+  posthog.capture('phase_time_spent', {
+    module_id: moduleId,
+    module_name: moduleName,
+    phase: phaseName,
+    duration_seconds: durationSeconds,
   });
 };
 

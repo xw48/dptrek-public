@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Search, Lightbulb, BookOpen, FlaskConical, PenLine,
-  ChevronLeft, ChevronRight, CheckCircle2, XCircle, Home
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 
 // Centralized state
@@ -12,6 +12,7 @@ import { useAppContext } from "../AppContext";
 import {
   trackModuleStart,
   trackPhaseComplete,
+  trackPhaseTime,
   trackReflectionSubmit,
   trackTestComplete,
   trackModuleComplete,
@@ -68,7 +69,7 @@ function PhaseTab({ phase, isActive, isUnlocked, onClick }) {
   );
 }
 
-function IframePhase({ phase, onNext, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl' } }) {
+function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl' } }) {
   const [bottomMessage, setBottomMessage] = useState(null); // { text, type } — stays until next action
   const [showOverlay, setShowOverlay] = useState(phase.title === "Experiment"); // Show overlay for Experiment phase
   const [taskCompleted, setTaskCompleted] = useState(false);
@@ -139,21 +140,37 @@ function IframePhase({ phase, onNext, config, textSizeScale = { base: 'text-base
       <div className="rounded-2xl overflow-hidden border-2 border-gray-200 shadow-lg relative">
         {/* Simulation Header - Outside iframe */}
         <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 flex justify-between items-center border-b-4 border-amber-700">
-          <button
-            onClick={handleLeave}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg uppercase text-sm tracking-wide transition-all hover:scale-105 shadow-md"
-          >
-            Leave
-          </button>
+          {/* Leave button with tooltip */}
+          <div className="relative group">
+            <button
+              onClick={handleLeave}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg uppercase text-sm tracking-wide transition-all hover:scale-105 shadow-md"
+            >
+              Leave
+            </button>
+            <div className="absolute left-0 top-full mt-2 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+              Leave this simulated website
+              <div className="absolute -top-1.5 left-5 w-3 h-3 bg-gray-900 rotate-45" />
+            </div>
+          </div>
+
           <div className="bg-white text-amber-700 font-extrabold py-2 px-5 rounded-lg uppercase text-sm tracking-widest shadow-md">
             ⚠ {phase.simulationLabel || "Simulation Website"}
           </div>
-          <button
-            onClick={handleReport}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg uppercase text-sm tracking-wide transition-all hover:scale-105 shadow-md"
-          >
-            Report
-          </button>
+
+          {/* Report button with tooltip */}
+          <div className="relative group">
+            <button
+              onClick={handleReport}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg uppercase text-sm tracking-wide transition-all hover:scale-105 shadow-md"
+            >
+              Report
+            </button>
+            <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+              Report this website to a regulatory agency
+              <div className="absolute -top-1.5 right-5 w-3 h-3 bg-gray-900 rotate-45" />
+            </div>
+          </div>
         </div>
 
         {/* Iframe - Just the website content */}
@@ -217,7 +234,12 @@ function IframePhase({ phase, onNext, config, textSizeScale = { base: 'text-base
 
       {/* Continue Button — only after task is completed */}
       {taskCompleted ? (
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          {onPrev ? (
+            <button onClick={onPrev} className="btn-secondary">
+              <ChevronLeft className="w-5 h-5" /> Previous
+            </button>
+          ) : <div />}
           <button onClick={onNext} className="btn-primary">
             Continue <ChevronRight className="w-5 h-5" />
           </button>
@@ -231,7 +253,7 @@ function IframePhase({ phase, onNext, config, textSizeScale = { base: 'text-base
   );
 }
 
-function ReflectionPhase({ phase, onNext, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl' } }) {
+function ReflectionPhase({ phase, onNext, onPrev, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl' } }) {
   const [answers, setAnswers] = useState({});
   const [otherText, setOtherText] = useState({});
   const [comments, setComments] = useState({});
@@ -448,7 +470,12 @@ function ReflectionPhase({ phase, onNext, config, textSizeScale = { base: 'text-
 
       {/* Continue Button */}
       {allAnswered && (
-        <div className="flex justify-end pt-2">
+        <div className="flex items-center justify-between pt-2">
+          {onPrev ? (
+            <button onClick={onPrev} className="btn-secondary">
+              <ChevronLeft className="w-5 h-5" /> Previous
+            </button>
+          ) : <div />}
           <button onClick={() => {
             // Save all reflection answers to Supabase
             phase.questions.forEach(q => {
@@ -767,7 +794,7 @@ function InteractiveExample({ example, config }) {
   );
 }
 
-function LearningPhase({ phase, onNext, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl', '3xl': 'text-3xl' } }) {
+function LearningPhase({ phase, onNext, onPrev, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl', '2xl': 'text-2xl', '3xl': 'text-3xl' } }) {
   const [expandedCards, setExpandedCards] = useState({});
 
   const toggleCard = (i) => {
@@ -819,7 +846,12 @@ function LearningPhase({ phase, onNext, config, textSizeScale = { base: 'text-ba
           );
         })}
       </div>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        {onPrev ? (
+          <button onClick={onPrev} className="btn-secondary">
+            <ChevronLeft className="w-5 h-5" /> Previous
+          </button>
+        ) : <div />}
         <button onClick={onNext} className="btn-primary">
           Continue <ChevronRight className="w-5 h-5" />
         </button>
@@ -906,44 +938,26 @@ function TestPhase({ phase, onComplete, textSizeScale = { base: 'text-base', lar
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center gap-6 py-8">
+      <div className="flex flex-col items-center gap-6 py-12">
         <div className={`text-8xl ${passed ? "animate-bounce" : ""}`}>
           {passed ? "🎉" : "😅"}
         </div>
-        <div className={`text-center rounded-2xl p-8 w-full max-w-md border-2 ${passed ? "bg-green-50 border-green-300" : "bg-orange-50 border-orange-300"}`}>
-          <p className="text-4xl font-bold mb-2" style={{ color: passed ? "#16a34a" : "#ea580c" }}>
+        <div className={`text-center rounded-2xl p-10 w-full max-w-sm border-2 ${passed ? "bg-green-50 border-green-300" : "bg-orange-50 border-orange-300"}`}>
+          <p className="text-6xl font-black mb-3" style={{ color: passed ? "#16a34a" : "#ea580c" }}>
             {score} / {phase.questions.length}
           </p>
           <p className="text-xl font-semibold text-gray-800 mb-1">
-            {passed ? "Well done! Module complete!" : "Almost there!"}
+            {passed ? "Well done!" : "Almost there!"}
           </p>
-          <p className="text-base text-gray-600">
-            {passed ? "You've successfully completed this module." : "Review the learning section and try again."}
+          <p className="text-base text-gray-500">
+            {passed ? "You've passed this module." : "You need 75% to pass. Try again!"}
           </p>
-        </div>
-        <div className="w-full flex flex-col gap-4">
-          {phase.questions.map((q, i) => {
-            const isCorrect = answers[q.id] === q.correct;
-            return (
-              <div key={q.id} className={`rounded-xl p-4 border-2 ${isCorrect ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"}`}>
-                <div className="flex items-start gap-2 mb-2">
-                  {isCorrect ? <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" /> : <XCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />}
-                  <p className="text-base font-semibold text-gray-900">{i + 1}. {q.question}</p>
-                </div>
-                {!isCorrect && (
-                  <p className="text-sm text-gray-700 ml-7">
-                    ✅ Correct: <span className="font-semibold">{q.options.find(o => o.id === q.correct)?.text}</span>
-                  </p>
-                )}
-              </div>
-            );
-          })}
         </div>
         <div className="flex gap-4">
           {!passed && <button onClick={handleRetry} className="btn-secondary">Try Again</button>}
           {passed && (
             <button onClick={onComplete} className="btn-primary">
-              Back to Home <Home className="w-5 h-5" />
+              Complete Module <ChevronRight className="w-5 h-5" />
             </button>
           )}
         </div>
@@ -1107,6 +1121,7 @@ export default function Module() {
   const [currentPhase, setCurrentPhase] = useState("experience");
   const [unlockedPhases, setUnlockedPhases] = useState(["experience"]);
   const [moduleCompleted, setModuleCompleted] = useState(false);
+  const phaseStartTime = useRef(Date.now());
 
   if (!config) {
     return (
@@ -1126,12 +1141,22 @@ export default function Module() {
     trackModuleStart(config.id, config.title);
   }, [config.id, config.title]);
 
+  const goToPrevPhase = () => {
+    const prev = PHASES[currentIndex - 1];
+    if (prev) {
+      phaseStartTime.current = Date.now();
+      setCurrentPhase(prev);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const goToNextPhase = () => {
     const next = PHASES[currentIndex + 1];
     if (next) {
-      // Track phase completion
+      const duration = Math.round((Date.now() - phaseStartTime.current) / 1000);
+      trackPhaseTime(config.id, config.title, currentPhase, duration);
       trackPhaseComplete(config.id, config.title, currentPhase);
-      
+      phaseStartTime.current = Date.now();
       setUnlockedPhases(prev => prev.includes(next) ? prev : [...prev, next]);
       setCurrentPhase(next);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1139,7 +1164,8 @@ export default function Module() {
   };
 
   const handleComplete = () => {
-    // Track module completion
+    const duration = Math.round((Date.now() - phaseStartTime.current) / 1000);
+    trackPhaseTime(config.id, config.title, currentPhase, duration);
     trackModuleComplete(config.id, config.title);
     saveModuleCompletion({ moduleId: config.id, moduleTitle: config.title });
     
@@ -1227,10 +1253,10 @@ export default function Module() {
           <h1 className={`${textSizeScale['3xl']} font-bold text-gray-900 mt-1`}>{config.title}</h1>
         </div>
 
-        {currentPhase === "experience"  && <IframePhase    phase={phaseData} onNext={goToNextPhase} config={config} textSizeScale={textSizeScale} />}
-        {currentPhase === "reflection"  && <ReflectionPhase phase={phaseData} onNext={goToNextPhase} config={config} textSizeScale={textSizeScale} />}
-        {currentPhase === "learning"    && <LearningPhase  phase={phaseData} onNext={goToNextPhase} config={config} textSizeScale={textSizeScale} />}
-        {currentPhase === "experiment"  && <IframePhase    phase={phaseData} onNext={goToNextPhase} config={config} textSizeScale={textSizeScale} />}
+        {currentPhase === "experience"  && <IframePhase    phase={phaseData} onNext={goToNextPhase} onPrev={null}            config={config} textSizeScale={textSizeScale} />}
+        {currentPhase === "reflection"  && <ReflectionPhase phase={phaseData} onNext={goToNextPhase} onPrev={goToPrevPhase} config={config} textSizeScale={textSizeScale} />}
+        {currentPhase === "learning"    && <LearningPhase  phase={phaseData} onNext={goToNextPhase} onPrev={goToPrevPhase} config={config} textSizeScale={textSizeScale} />}
+        {currentPhase === "experiment"  && <IframePhase    phase={phaseData} onNext={goToNextPhase} onPrev={goToPrevPhase} config={config} textSizeScale={textSizeScale} />}
         {currentPhase === "test"        && <TestPhase      phase={phaseData} onComplete={handleComplete} textSizeScale={textSizeScale} />}
       </main>
 
@@ -1242,6 +1268,14 @@ export default function Module() {
           border-radius: 0.75rem; transition: background 0.2s; cursor: pointer;
         }
         .btn-primary:hover { background: #6d28d9; }
+        .btn-secondary {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          background: white; color: #7c3aed; font-weight: 700;
+          border: 2px solid #7c3aed;
+          font-size: 1rem; padding: 0.75rem 1.75rem;
+          border-radius: 0.75rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: #f5f3ff; }
         .btn-secondary {
           display: inline-flex; align-items: center; gap: 0.5rem;
           background: #f3f4f6; color: #374151; font-weight: 700;

@@ -643,8 +643,6 @@
         <div class="transition-box">
             <div style="font-size: 48px; margin-bottom: 12px;" id="transEmoji">✅</div>
             <h2 id="transTitle">Scenario 1 Complete</h2>
-            <div class="transition-feedback" id="transFeedback"></div>
-            <p id="transText"></p>
             <button class="transition-btn" onclick="goToNextScenario()">Next Scenario →</button>
         </div>
     </div>
@@ -655,7 +653,6 @@
             <div class="complete-emoji" id="finalEmoji">🎉</div>
             <h2 class="complete-title" id="finalTitle">Test Complete!</h2>
             <div class="complete-score" id="finalScore"></div>
-            <p class="complete-text" id="finalText"></p>
             <button class="complete-btn" onclick="finishTest()">Finish</button>
         </div>
     </div>
@@ -705,21 +702,13 @@
                 setTimeout(() => showS1Nag(), 1200);
             } else {
                 score++;
-                showTransition(
-                    "✅", "Scenario 1 Complete",
-                    "You resisted!", "feedback-pass",
-                    "Great job! You said 'No' " + S1_MAX_NAGS + " times despite the website changing its message to pressure you. Notice how it went from a casual ask to guilt-tripping."
-                );
+                showTransition("✅", "Scenario 1 Complete");
             }
         }
 
         function handleS1Allow() {
             document.getElementById('browserNotif').classList.remove('active');
-            showTransition(
-                "⚠️", "Scenario 1 Complete",
-                "You gave in", "feedback-fail",
-                "The website nagged you until you allowed notifications. Next time, keep saying 'No' — they change the wording to make you feel bad, but it's still the same request."
-            );
+            showTransition("⚠️", "Scenario 1 Complete");
         }
 
         // ===== SCENARIO 2 =====
@@ -760,12 +749,9 @@
         }
 
         // ===== TRANSITIONS =====
-        function showTransition(emoji, title, feedback, feedbackClass, text) {
+        function showTransition(emoji, title) {
             document.getElementById('transEmoji').textContent = emoji;
             document.getElementById('transTitle').textContent = title;
-            document.getElementById('transFeedback').textContent = feedback;
-            document.getElementById('transFeedback').className = 'transition-feedback ' + feedbackClass;
-            document.getElementById('transText').textContent = text;
             document.getElementById('transitionModal').classList.add('active');
         }
 
@@ -782,9 +768,6 @@
             document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
             document.getElementById('finalScore').textContent = score + ' / 2';
             document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
-            document.getElementById('finalText').textContent = passed
-                ? 'You successfully resisted nagging in both scenarios! You now know how to recognize when websites and apps are trying to wear you down with repeated requests.'
-                : 'You gave in to some nagging. Remember: if a website or app keeps asking the same thing in different ways after you\'ve said no, that\'s nagging — stay firm!';
             document.getElementById('completeModal').classList.add('active');
         }
 
