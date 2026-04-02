@@ -70,11 +70,35 @@
         }
         .ad-item strong { font-size: 13px; color: #dc2626; }
         .ad-item span { font-size: 12px; color: #666; display: block; margin-top: 2px; }
+        /* Intro Screen */
+        .intro-alert {
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .intro-alert h2 { font-size: 24px; color: #1a1a1a; margin-bottom: 20px; }
+        .intro-alert p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px; }
+        .next-btn {
+            background: #2563eb; color: white; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+        }
+        .next-btn:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
 
-    <div class="site">
+    <div class="intro-alert" id="introAlert">
+        <h2>Shopping Website Experience</h2>
+        <p>Imagine you're signing up for a shopping website. Please pay attention to the settings on the welcome screen.</p>
+        <button class="next-btn" onclick="startExperience()">Next</button>
+    </div>
+
+    <div class="site" id="mainContent" style="display: none;">
         <nav class="navbar">
             <div class="nav-logo">Shop<span>Smart</span> Electronics</div>
             <div class="nav-links">
@@ -99,7 +123,7 @@
     </div>
 
     <!-- Settings Popup -->
-    <div class="overlay" id="settingsOverlay">
+    <div class="overlay hidden" id="settingsOverlay">
         <div class="settings-popup">
             <h2>Personalized Advertisement Settings</h2>
             <p>We will offer you ads you like.</p>
@@ -122,6 +146,12 @@
     </div>
 
     <script>
+        function startExperience() {
+            document.getElementById('introAlert').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('settingsOverlay').classList.remove('hidden');
+        }
+
         function handleConfirm() {
             const adsEnabled = document.getElementById('adsCheckbox').checked;
             document.getElementById('settingsOverlay').classList.add('hidden');

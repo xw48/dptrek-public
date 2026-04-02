@@ -256,12 +256,37 @@
             font-size: 13px;
             color: #666;
         }
+
+        /* Intro Screen */
+        .intro-alert {
+            background: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .intro-alert h2 { font-size: 24px; color: #1a1a1a; margin-bottom: 20px; }
+        .intro-alert p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px; }
+        .next-btn {
+            background: #2563eb; color: white; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+        }
+        .next-btn:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
 
+    <div class="intro-alert" id="introAlert">
+        <h2>Shopping Website Experience</h2>
+        <p>Browse this shopping website and notice what happens when you try to dismiss notifications.</p>
+        <button class="next-btn" onclick="startExperience()">Next</button>
+    </div>
+
     <!-- Shopping Site -->
-    <div class="shopping-site">
+    <div class="shopping-site" id="mainContent" style="display: none;">
         <nav class="navbar">
             <div class="nav-content">
                 <div class="logo">ABC Shopping Store</div>
@@ -387,10 +412,14 @@
             }
         ];
 
-        // Show first popup after 2 seconds
-        setTimeout(() => {
-            showPopup();
-        }, 2000);
+        function startExperience() {
+            document.getElementById('introAlert').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            // Show first popup after 2 seconds
+            setTimeout(() => {
+                showPopup();
+            }, 2000);
+        }
 
         function showPopup() {
             const nag = nags[nagCount];

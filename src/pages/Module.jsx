@@ -16,7 +16,6 @@ import {
   trackReflectionSubmit,
   trackTestComplete,
   trackModuleComplete,
-  trackSurveyClick,
   trackInteractiveExampleStep
 } from "../posthog";
 
@@ -32,11 +31,15 @@ import {
 import obstructionConfig from "../modules/obstruction/config";
 import naggingConfig from '../modules/nagging/config.js';
 import interferenceConfig from '../modules/interference/config.js';
+import sneakingConfig from '../modules/sneaking/config.js';
+import forcedActionConfig from '../modules/forced-action/config.js';
 
 const MODULE_CONFIGS = {
   1: obstructionConfig,
   2: naggingConfig,
   3: interferenceConfig,
+  4: sneakingConfig,
+  5: forcedActionConfig,
 };
 
 const PHASES = ["experience", "reflection", "learning", "experiment", "test"];
@@ -55,7 +58,7 @@ function PhaseTab({ phase, isActive, isUnlocked, onClick }) {
     <button
       onClick={() => isUnlocked && onClick(phase)}
       disabled={!isUnlocked}
-      className={`flex flex-col items-center gap-0.5 px-5 py-2 rounded-xl text-xs font-bold transition-all
+      className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all min-w-[90px]
         ${isActive
           ? "bg-purple-600 text-white shadow-md"
           : isUnlocked
@@ -70,9 +73,10 @@ function PhaseTab({ phase, isActive, isUnlocked, onClick }) {
 }
 
 function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 'text-base', large: 'text-lg', xl: 'text-xl' } }) {
-  const [bottomMessage, setBottomMessage] = useState(null); // { text, type } — stays until next action
-  const [showOverlay, setShowOverlay] = useState(phase.title === "Experiment"); // Show overlay for Experiment phase
+  const [bottomMessage, setBottomMessage] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(phase.title === "Experiment");
   const [taskCompleted, setTaskCompleted] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
   const isExperiment = phase.title === "Experiment";
 
   // Listen for task completion from iframe
@@ -131,15 +135,15 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      <div className={`bg-blue-50 border border-blue-200 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-blue-800 ${textSizeScale.base} font-medium`}>
+    <div className="flex flex-col gap-2">
+      <div className={`bg-blue-50 border border-blue-200 rounded-xl px-3 py-1.5 text-blue-800 ${textSizeScale.base} font-medium`}>
         💡 {phase.instruction}
       </div>
 
       {/* Simulation Frame with Header */}
       <div className="rounded-2xl overflow-hidden border-2 border-gray-200 shadow-lg relative">
         {/* Simulation Header - Outside iframe */}
-        <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 flex justify-between items-center border-b-4 border-amber-700">
+        <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2 flex justify-between items-center border-b-4 border-amber-700">
           {/* Leave button with tooltip */}
           <div className="relative group">
             <button
@@ -148,7 +152,7 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
             >
               Leave
             </button>
-            <div className="absolute left-0 top-full mt-2 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+            <div className="absolute left-0 top-full mt-2 w-52 bg-gray-900 text-white text-sm font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
               Leave this simulated website
               <div className="absolute -top-1.5 left-5 w-3 h-3 bg-gray-900 rotate-45" />
             </div>
@@ -166,7 +170,7 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
             >
               Report
             </button>
-            <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+            <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-sm font-medium rounded-lg px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
               Report this website to a regulatory agency
               <div className="absolute -top-1.5 right-5 w-3 h-3 bg-gray-900 rotate-45" />
             </div>
@@ -174,12 +178,21 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
         </div>
 
         {/* Iframe - Just the website content */}
-        <div className={`w-full ${showOverlay ? 'filter blur-sm' : ''}`} style={{ height: "520px" }}>
-          <iframe
-            src={phase.iframeSrc}
-            className="w-full h-full"
-            title="Interactive simulation"
-          />
+        <div className="relative w-full" style={{ height: "calc(100vh - 210px)" }}>
+          {iframeLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10 gap-3">
+              <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+              <p className="text-sm text-gray-500 font-medium">Loading simulation...</p>
+            </div>
+          )}
+          <div className={`w-full h-full ${showOverlay ? 'filter blur-sm' : ''}`}>
+            <iframe
+              src={phase.iframeSrc}
+              className="w-full h-full"
+              title="Interactive simulation"
+              onLoad={() => setIframeLoading(false)}
+            />
+          </div>
         </div>
 
         {/* Overlay for Experiment Phase */}
@@ -259,7 +272,7 @@ function ReflectionPhase({ phase, onNext, onPrev, config, textSizeScale = { base
   const [comments, setComments] = useState({});
   // State for feeling_combined type
   const [selectedFeelings, setSelectedFeelings] = useState([]);
-  const [intensity, setIntensity] = useState(3);
+  const [intensities, setIntensities] = useState({});
 
   const allAnswered = phase.questions.every(q => {
     if (q.type === 'feeling_combined') {
@@ -298,9 +311,17 @@ function ReflectionPhase({ phase, onNext, onPrev, config, textSizeScale = { base
   };
 
   const toggleFeeling = (feelingId) => {
-    setSelectedFeelings(prev =>
-      prev.includes(feelingId) ? prev.filter(f => f !== feelingId) : [...prev, feelingId]
-    );
+    setSelectedFeelings(prev => {
+      if (prev.includes(feelingId)) {
+        // Remove feeling and its intensity
+        setIntensities(p => { const n = { ...p }; delete n[feelingId]; return n; });
+        return prev.filter(f => f !== feelingId);
+      } else {
+        // Add feeling with default intensity 3
+        setIntensities(p => ({ ...p, [feelingId]: 3 }));
+        return [...prev, feelingId];
+      }
+    });
   };
 
   const intensityLabels = ["", "Slightly", "A little", "Moderately", "Strongly", "Extremely"];
@@ -354,26 +375,37 @@ function ReflectionPhase({ phase, onNext, onPrev, config, textSizeScale = { base
                 </div>
               </div>
 
-              {/* Intensity slider — appears after selecting at least one feeling */}
+              {/* Per-feeling intensity sliders */}
               {selectedFeelings.length > 0 && (
                 <div className="mb-5 bg-purple-50 rounded-xl p-4 border border-purple-200">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">{q.intensityLabel}</p>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs sm:text-sm text-gray-500 w-14 text-right">Slightly</span>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={intensity}
-                      onChange={(e) => setIntensity(Number(e.target.value))}
-                      className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
-                    />
-                    <span className="text-xs sm:text-sm text-gray-500 w-18">Extremely</span>
-                  </div>
-                  <div className="text-center mt-2">
-                    <span className="inline-block bg-white px-3 py-1 rounded-full text-sm font-bold text-purple-700 border border-purple-200">
-                      {intensity}/5 — {intensityLabels[intensity]}
-                    </span>
+                  <p className="text-sm font-semibold text-gray-700 mb-4">{q.intensityLabel}</p>
+                  <div className="flex flex-col gap-4">
+                    {selectedFeelings.map(fId => {
+                      const feeling = q.feelings.find(f => f.id === fId);
+                      const val = intensities[fId] || 3;
+                      return (
+                        <div key={fId}>
+                          <p className="text-sm font-bold text-purple-800 mb-1.5">{feeling?.label}</p>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-gray-500 w-12 text-right">Slightly</span>
+                            <input
+                              type="range"
+                              min="1"
+                              max="5"
+                              value={val}
+                              onChange={(e) => setIntensities(prev => ({ ...prev, [fId]: Number(e.target.value) }))}
+                              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                            />
+                            <span className="text-xs text-gray-500 w-16">Extremely</span>
+                          </div>
+                          <div className="text-center mt-1">
+                            <span className="inline-block bg-white px-2.5 py-0.5 rounded-full text-xs font-bold text-purple-700 border border-purple-200">
+                              {val}/5 — {intensityLabels[val]}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -487,7 +519,7 @@ function ReflectionPhase({ phase, onNext, onPrev, config, textSizeScale = { base
                   questionText: q.question,
                   answerType: 'feeling_combined',
                   selectedFeelings: selectedFeelings,
-                  intensity: intensity,
+                  intensities: intensities,
                 });
               } else if (answers[q.id]) {
                 const opt = q.options.find(o => o.id === answers[q.id]);
@@ -883,11 +915,11 @@ function TestPhase({ phase, onComplete, textSizeScale = { base: 'text-base', lar
   // If this is a simulation-based test
   if (phase.isSimulation) {
     return (
-      <div className="flex flex-col gap-6">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 text-amber-800 text-base font-medium">
+      <div className="flex flex-col gap-2">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5 text-amber-800 text-base font-medium">
           🎯 {phase.instruction}
         </div>
-        <div className="w-full rounded-2xl overflow-hidden border-2 border-gray-200 shadow-lg" style={{ height: "680px" }}>
+        <div className="w-full rounded-2xl overflow-hidden border-2 border-gray-200 shadow-lg" style={{ height: "calc(100vh - 160px)" }}>
           <iframe
             src={phase.iframeSrc}
             className="w-full h-full"
@@ -1009,94 +1041,60 @@ function TestPhase({ phase, onComplete, textSizeScale = { base: 'text-base', lar
 }
 
 // Congratulations/Completion Phase
-function CongratulationsPhase({ config, onGoHome }) {
+function CongratulationsPhase({ config, onGoHome, onNextModule, hasNextModule }) {
   return (
     <div className="flex flex-col items-center gap-8 py-12 px-4">
-      {/* Celebration Animation */}
-      <div className="text-9xl animate-bounce">
-        🎉
-      </div>
+      <div className="text-9xl animate-bounce">🎉</div>
 
-      {/* Congratulations Card */}
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-3xl p-8 sm:p-10 max-w-2xl w-full shadow-xl text-center">
-        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3">
-          Congratulations! 🎊
+      <div className="bg-white border border-green-200 rounded-3xl p-8 sm:p-10 max-w-lg w-full shadow-xl text-center">
+        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-2">
+          Module Complete!
         </h1>
-        <p className="text-xl sm:text-2xl font-bold text-green-700 mb-4">
-          You've Completed: {config.title}
-        </p>
-        <p className="text-base sm:text-lg text-gray-700 mb-6">
-          You've successfully learned how to recognize and protect yourself from the <span className="font-bold text-green-800">{config.title}</span> dark pattern!
+        <p className="text-lg text-gray-500 mb-8">
+          You've learned how to spot and resist the <span className="font-semibold text-gray-700">{config.title}</span> dark pattern.
         </p>
 
         {/* Achievement Badge */}
-        <div className="inline-block bg-white rounded-2xl px-6 py-4 shadow-md mb-8">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">✓</span>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-gray-600">Module Completed</p>
-              <p className="text-lg font-bold text-gray-900">{config.title}</p>
-            </div>
+        <div className="flex items-center justify-center gap-4 bg-green-50 border border-green-200 rounded-2xl px-6 py-5 mb-8">
+          <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl font-black shadow-md">
+            ✓
+          </div>
+          <div className="text-left">
+            <p className="text-xs font-semibold text-green-600 uppercase tracking-wide">Module {config.id} Completed</p>
+            <p className="text-lg font-bold text-gray-900">{config.title}</p>
           </div>
         </div>
 
-        {/* What's Next */}
-        <div className="bg-white rounded-xl p-5 mb-6 text-left">
-          <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span>🚀</span> What's Next?
-          </h3>
-          <ul className="space-y-2 text-sm sm:text-base text-gray-700">
-            <li className="flex items-start gap-2">
-              <span className="text-green-600 font-bold flex-shrink-0">✓</span>
-              <span>Continue to the next module to learn about other dark patterns</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600 font-bold flex-shrink-0">✓</span>
-              <span>Share what you've learned with friends and family</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-600 font-bold flex-shrink-0">✓</span>
-              <span>Stay vigilant when browsing online!</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Post-Survey Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-xl p-5 mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <span>📋</span> Help Us Improve!
-          </h3>
-          <p className="text-sm text-gray-700 mb-4">
-            Your feedback helps us make this learning experience better for everyone.
-          </p>
-          
-          {/* POST-SURVEY LINK PLACEHOLDER */}
+        {/* Survey */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 mb-4 text-left">
+          <p className="text-white font-bold text-base mb-0.5">Help us improve! 📋</p>
+          <p className="text-purple-200 text-sm mb-3">Share your feedback — takes 2 minutes.</p>
           <a
             href="https://forms.google.com/your-survey-link-here"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackSurveyClick(config.id, config.title)}
-            className="inline-block w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md hover:shadow-lg"
+            className="inline-block bg-white text-purple-700 font-bold text-sm py-2 px-5 rounded-lg hover:bg-purple-50 transition shadow-sm"
           >
-            📝 Take Post-Module Survey
+            Take Survey →
           </a>
-          <p className="text-xs text-gray-500 mt-2">Takes about 2-3 minutes</p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onGoHome}
-            className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2"
           >
-            <span>🏠</span> Back to Home
+            🏠 Back to Home
           </button>
-          <button
-            onClick={onGoHome}
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-          >
-            Next Module <ChevronRight className="w-5 h-5" />
-          </button>
+          {hasNextModule && (
+            <button
+              onClick={onNextModule}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md flex items-center justify-center gap-2"
+            >
+              Next Module <ChevronRight className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -1118,10 +1116,23 @@ export default function Module() {
 
   const { textSize, setTextSize, textSizeScale } = useAppContext();
 
-  const [currentPhase, setCurrentPhase] = useState("experience");
-  const [unlockedPhases, setUnlockedPhases] = useState(["experience"]);
+  const [currentPhase, setCurrentPhase] = useState(() =>
+    localStorage.getItem(`dptrek_phase_${id}`) || "experience"
+  );
+  const [unlockedPhases, setUnlockedPhases] = useState(() => {
+    const saved = localStorage.getItem(`dptrek_unlocked_${id}`);
+    return saved ? JSON.parse(saved) : ["experience"];
+  });
   const [moduleCompleted, setModuleCompleted] = useState(false);
   const phaseStartTime = useRef(Date.now());
+
+  useEffect(() => {
+    localStorage.setItem(`dptrek_phase_${id}`, currentPhase);
+  }, [currentPhase, id]);
+
+  useEffect(() => {
+    localStorage.setItem(`dptrek_unlocked_${id}`, JSON.stringify(unlockedPhases));
+  }, [unlockedPhases, id]);
 
   if (!config) {
     return (
@@ -1168,7 +1179,8 @@ export default function Module() {
     trackPhaseTime(config.id, config.title, currentPhase, duration);
     trackModuleComplete(config.id, config.title);
     saveModuleCompletion({ moduleId: config.id, moduleTitle: config.title });
-    
+    localStorage.removeItem(`dptrek_phase_${id}`);
+    localStorage.removeItem(`dptrek_unlocked_${id}`);
     setModuleCompleted(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -1192,7 +1204,12 @@ export default function Module() {
             />
           </div>
         </div>
-        <CongratulationsPhase config={config} onGoHome={handleGoHome} />
+        <CongratulationsPhase
+          config={config}
+          onGoHome={handleGoHome}
+          hasNextModule={!!MODULE_CONFIGS[Number(id) + 1]}
+          onNextModule={() => navigate(`/module/${Number(id) + 1}`)}
+        />
       </div>
     );
   }
@@ -1200,7 +1217,7 @@ export default function Module() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="px-6 py-3 flex items-center justify-between gap-4">
+        <div className="px-6 py-2 flex items-center justify-between gap-4">
 
           {/* Left: Home */}
           <Link to="/" className="flex items-center gap-1.5 text-gray-500 hover:text-purple-700 font-semibold transition flex-shrink-0">
@@ -1247,10 +1264,10 @@ export default function Module() {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <div className="mb-8">
-          <span className={`${textSizeScale.base} font-bold text-purple-600 uppercase tracking-widest`}>Module {config.id}</span>
-          <h1 className={`${textSizeScale['3xl']} font-bold text-gray-900 mt-1`}>{config.title}</h1>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-3">
+        <div className="mb-2">
+          <span className={`${textSizeScale.sm || 'text-sm'} font-bold text-purple-600 uppercase tracking-widest`}>Module {config.id}</span>
+          <h1 className={`${textSizeScale['2xl'] || 'text-2xl'} font-bold text-gray-900 mt-0.5`}>{config.title}</h1>
         </div>
 
         {currentPhase === "experience"  && <IframePhase    phase={phaseData} onNext={goToNextPhase} onPrev={null}            config={config} textSizeScale={textSizeScale} />}

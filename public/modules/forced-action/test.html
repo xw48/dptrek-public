@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forced Action Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* ===== Intro ===== */
+        .intro-screen {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        .intro-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 540px;
+            text-align: center;
+        }
+        .intro-box h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; color: #1e293b; }
+        .intro-box p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 8px; }
+        .intro-rules {
+            text-align: left;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin: 18px 0;
+        }
+        .intro-rules li {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 8px;
+            list-style: none;
+            padding-left: 24px;
+            position: relative;
+        }
+        .intro-rules li::before { content: "🎯"; position: absolute; left: 0; }
+        .intro-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .intro-btn:hover { background: #4f46e5; }
+
+        /* ===== Scenario Container ===== */
+        .scenario { display: none; min-height: 100vh; }
+        .scenario.active { display: block; }
+
+        /* ========================================
+           SCENARIO 1: Forced Cookie Consent
+           ======================================== */
+        .consent-site {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .consent-bg {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.15;
+        }
+        .consent-bg-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 600px;
+        }
+        .consent-bg-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        /* Consent modal */
+        .consent-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 460px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .consent-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .consent-text {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .consent-text a { color: #6366f1; text-decoration: underline; }
+        .consent-checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .consent-checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+        }
+        .consent-checkbox-label {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 600;
+        }
+        .consent-agree-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .consent-disagree-text {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            cursor: pointer;
+        }
+        .consent-disagree-text:hover { color: #64748b; }
+
+        .consent-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* ========================================
+           SCENARIO 2: Hidden Marketing Agreement
+           ======================================== */
+        .webinar-site {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .webinar-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .webinar-banner {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            position: relative;
+        }
+        .webinar-banner-content {
+            text-align: center;
+            color: white;
+        }
+        .webinar-banner-text {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+        .webinar-banner-sub {
+            font-size: 14px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Sign up form overlay */
+        .webinar-form-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 380px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+        .webinar-form-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+        .webinar-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .webinar-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1e293b;
+            outline: none;
+            margin-bottom: 14px;
+        }
+        .webinar-input:focus { border-color: #6366f1; }
+        .webinar-signup-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e293b;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .webinar-signup-btn:hover { background: #334155; }
+        .webinar-fine-print {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+        .webinar-leave-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .webinar-leave-btn:hover { color: #64748b; }
+
+        .webinar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* ===== Transition & Complete ===== */
+        .transition-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .transition-modal.active { display: flex; }
+        .transition-box {
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            max-width: 460px;
+            width: 90%;
+        }
+        .transition-box h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+        .transition-box p { font-size: 14px; color: #64748b; margin-bottom: 6px; line-height: 1.5; }
+        .transition-feedback {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 0 16px;
+        }
+        .feedback-pass { background: #f0fdf4; color: #16a34a; }
+        .feedback-fail { background: #fef2f2; color: #ef4444; }
+        .transition-btn {
+            background: #6366f1;
+            color: white;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .complete-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .complete-modal.active { display: flex; }
+        .complete-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+        }
+        .complete-emoji { font-size: 56px; margin-bottom: 14px; }
+        .complete-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: #1e293b; }
+        .complete-score { font-size: 42px; font-weight: 900; margin: 12px 0; }
+        .complete-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- INTRO -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-box">
+            <div style="font-size: 52px; margin-bottom: 12px;">🎯</div>
+            <h2>Test Your Knowledge</h2>
+            <p>You'll face 2 realistic scenarios with forced action patterns. Your goal: don't let websites force you into unwanted agreements!</p>
+            <ul class="intro-rules">
+                <li>Scenario 1: A website that forces you to consent to cookies</li>
+                <li>Scenario 2: A webinar sign-up with hidden marketing terms</li>
+                <li>Read the fine print and look for alternatives!</li>
+            </ul>
+            <button class="intro-btn" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 1: Forced Cookie Consent ===== -->
+    <div class="scenario consent-site" id="scenario1">
+        <div class="consent-bg">
+            <div class="consent-bg-grid">
+                <div class="consent-bg-item">📱</div>
+                <div class="consent-bg-item">💻</div>
+                <div class="consent-bg-item">⌚</div>
+                <div class="consent-bg-item">🎧</div>
+                <div class="consent-bg-item">🖥️</div>
+                <div class="consent-bg-item">📷</div>
+            </div>
+        </div>
+
+        <div class="consent-overlay"></div>
+
+        <div class="consent-modal" id="consentModal">
+            <div class="consent-title">Need your consent:</div>
+            <div class="consent-text">
+                In order to provide you with services, we need to collect and process your information. Please read our <a href="#">Privacy</a> and <a href="#">Cookie Statement</a> and <a href="#">Terms Conditions</a> before using our platform.
+            </div>
+            <div class="consent-checkbox-row">
+                <input type="checkbox" id="selectAll">
+                <label class="consent-checkbox-label" for="selectAll">Select all</label>
+            </div>
+            <button class="consent-agree-btn" onclick="handleConsentAgree()">Agree and Continue</button>
+            <div class="consent-disagree-text" onclick="handleConsentDisagree()">If disagree, please close the website</div>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 2: Hidden Marketing Agreement ===== -->
+    <div class="scenario webinar-site" id="scenario2">
+        <div class="webinar-bg">
+            <div class="webinar-banner">
+                <div class="webinar-banner-content">
+                    <div class="webinar-banner-text">Sign Up<br>Today</div>
+                    <div class="webinar-banner-sub">Webinar August 29th</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="webinar-overlay"></div>
+
+        <div class="webinar-form-card" id="webinarForm">
+            <div class="webinar-form-title">Sign Up</div>
+
+            <label class="webinar-label">Name</label>
+            <input type="text" class="webinar-input" placeholder="Your name" id="wName">
+
+            <label class="webinar-label">Email</label>
+            <input type="email" class="webinar-input" placeholder="Your email" id="wEmail">
+
+            <label class="webinar-label">Password</label>
+            <input type="password" class="webinar-input" placeholder="Create password" id="wPassword">
+
+            <button class="webinar-signup-btn" onclick="handleWebinarSignUp()">Sign up</button>
+            <div class="webinar-fine-print">By signing up, you agree to receive marketing emails (including discount news).</div>
+            <div class="webinar-leave-btn" onclick="handleWebinarLeave()">Leave without signing up</div>
+        </div>
+    </div>
+
+    <!-- TRANSITION -->
+    <div class="transition-modal" id="transitionModal">
+        <div class="transition-box">
+            <div style="font-size: 48px; margin-bottom: 12px;" id="transEmoji">✅</div>
+            <h2 id="transTitle">Scenario Complete</h2>
+            <div class="transition-feedback" id="transFeedback"></div>
+            <p id="transExplanation"></p>
+            <br>
+            <button class="transition-btn" id="transBtn" onclick="goToNextScenario()">Next Scenario →</button>
+        </div>
+    </div>
+
+    <!-- COMPLETE -->
+    <div class="complete-modal" id="completeModal">
+        <div class="complete-box">
+            <div class="complete-emoji" id="finalEmoji">🎉</div>
+            <h2 class="complete-title" id="finalTitle">Test Complete!</h2>
+            <div class="complete-score" id="finalScore"></div>
+            <button class="complete-btn" onclick="finishTest()">Finish</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentScenario = 0;
+
+        function startTest() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('scenario1').classList.add('active');
+            currentScenario = 1;
+            notifyInteraction();
+        }
+
+        // ===== SCENARIO 1: Forced Cookie Consent =====
+        function handleConsentAgree() {
+            // Fell for it — agreed to everything
+            showTransition(
+                "⚠️",
+                "Scenario 1 Complete",
+                false,
+                'You clicked "Agree and Continue" which forces you to accept all cookies and tracking. The website gave you no real choice — the only alternative was to leave entirely. This is forced action.',
+                "You were forced to agree"
+            );
+        }
+
+        function handleConsentDisagree() {
+            // Recognized it! Chose to close/leave
+            score++;
+            showTransition(
+                "✅",
+                "Scenario 1 Complete",
+                true,
+                'You recognized that "Agree and Continue" was the only option and chose to leave instead. The website offered no way to use it without accepting all tracking — that\'s forced action.',
+                "You refused to be forced!"
+            );
+        }
+
+        // ===== SCENARIO 2: Hidden Marketing Agreement =====
+        function handleWebinarSignUp() {
+            // Signed up without reading fine print
+            showTransition(
+                "⚠️",
+                "Scenario 2 Complete",
+                false,
+                'By clicking "Sign up", you automatically agreed to receive marketing emails. The fine print said: "By signing up, you agree to receive marketing emails (including discount news)." Always read the small text!',
+                "Hidden agreement caught you"
+            );
+        }
+
+        function handleWebinarLeave() {
+            // Left without signing up — recognized the forced action
+            score++;
+            showTransition(
+                "✅",
+                "Scenario 2 Complete",
+                true,
+                'You noticed the fine print that says "By signing up, you agree to receive marketing emails" and chose to leave. Signing up would have automatically opted you into marketing spam with no way to decline.',
+                "You read the fine print!"
+            );
+        }
+
+        // ===== Transitions =====
+        function showTransition(emoji, title, passed, explanation, feedbackText) {
+            document.getElementById('transEmoji').textContent = emoji;
+            document.getElementById('transTitle').textContent = title;
+
+            const fb = document.getElementById('transFeedback');
+            fb.textContent = feedbackText;
+            fb.className = 'transition-feedback ' + (passed ? 'feedback-pass' : 'feedback-fail');
+
+            document.getElementById('transExplanation').textContent = explanation;
+
+            document.getElementById('transBtn').textContent = currentScenario >= 2 ? 'See Results →' : 'Next Scenario →';
+            document.getElementById('transitionModal').classList.add('active');
+        }
+
+        function goToNextScenario() {
+            document.getElementById('transitionModal').classList.remove('active');
+            document.getElementById('scenario' + currentScenario).classList.remove('active');
+            currentScenario++;
+
+            if (currentScenario <= 2) {
+                document.getElementById('scenario' + currentScenario).classList.add('active');
+                notifyInteraction();
+            } else {
+                showComplete();
+            }
+        }
+
+        function showComplete() {
+            const passed = score >= 2;
+            document.getElementById('finalEmoji').textContent = passed ? '🎉' : '💪';
+            document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
+            document.getElementById('finalScore').textContent = score + ' / 2';
+            document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
+            document.getElementById('completeModal').classList.add('active');
+        }
+
+        function finishTest() {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'test-complete',
+                    score: score,
+                    total: 2,
+                    passed: score >= 2
+                }, '*');
+            }
+        }
+
+        function notifyInteraction() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'user_interacted' }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

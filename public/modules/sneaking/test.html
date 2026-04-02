@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sneaking Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* ===== Intro ===== */
+        .intro-screen {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        .intro-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 540px;
+            text-align: center;
+        }
+        .intro-box h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; color: #1e293b; }
+        .intro-box p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 8px; }
+        .intro-rules {
+            text-align: left;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin: 18px 0;
+        }
+        .intro-rules li {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 8px;
+            list-style: none;
+            padding-left: 24px;
+            position: relative;
+        }
+        .intro-rules li::before { content: "🎯"; position: absolute; left: 0; }
+        .intro-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .intro-btn:hover { background: #4f46e5; }
+
+        /* ===== Scenario Container ===== */
+        .scenario { display: none; min-height: 100vh; }
+        .scenario.active { display: block; }
+
+        /* ========================================
+           SCENARIO 1: Restaurant Gratuity
+           ======================================== */
+        .restaurant {
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .restaurant::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .rest-content {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .rest-header { text-align: center; margin-bottom: 30px; }
+        .rest-name { font-size: 28px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .rest-tagline {
+            color: #a78bfa;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .rest-bill-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .rest-bill-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 15px;
+            color: #374151;
+        }
+        .bill-item.total {
+            border-top: 2px solid #e5e7eb;
+            margin-top: 10px;
+            padding-top: 14px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #0f172a;
+        }
+        .bill-divider { border: none; border-top: 1px dashed #e5e7eb; margin: 14px 0; }
+        .gratuity-section { margin-top: 20px; }
+        .gratuity-label { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .gratuity-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+        .gratuity-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .gratuity-btn {
+            padding: 12px 8px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .gratuity-btn:hover { border-color: #a78bfa; background: #f5f3ff; }
+        .gratuity-btn.selected { border-color: #7c3aed; background: #ede9fe; }
+        .gratuity-pct { font-size: 18px; font-weight: 700; color: #1e293b; }
+        .gratuity-amt { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .gratuity-sneaked {
+            font-size: 12px;
+            color: #ef4444;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 14px;
+            min-height: 16px;
+        }
+        .no-tip-link {
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            color: #cbd5e1;
+            cursor: pointer;
+            margin-bottom: 16px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .no-tip-link:hover { color: #94a3b8; }
+        .pay-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pay-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* ========================================
+           SCENARIO 2: Welcome Site — Cookie + Privacy
+           ======================================== */
+        .welcome-site {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .welcome-hero {
+            font-size: 64px;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .welcome-sub {
+            font-size: 18px;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 24px;
+        }
+        .welcome-subscribe-btn {
+            background: white;
+            color: #6d28d9;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 14px 36px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Shared modal overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+        }
+        .modal-overlay.hidden { display: none; }
+
+        /* Cookie Banner */
+        .cookie-banner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 460px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+        .cookie-banner.hidden { display: none; }
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .modal-text {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-text a { color: #6d28d9; }
+        .modal-note {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #6d28d9;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .btn-secondary {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Privacy Modal */
+        .privacy-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+        .privacy-modal.hidden { display: none; }
+        .privacy-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .priv-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .priv-btn-agree { background: #e5e7eb; color: #374151; }
+        .priv-btn-refuse { background: #e5e7eb; color: #374151; }
+        .priv-btn-continue { background: #6d28d9; color: white; }
+        .priv-btn-back { color: #6d28d9; background: none; text-decoration: underline; font-size: 12px; }
+
+        /* Confirm dialog */
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1100;
+            text-align: center;
+        }
+        .confirm-dialog.hidden { display: none; }
+        .confirm-title { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 16px; }
+        .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+        .confirm-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .confirm-cancel { background: #e5e7eb; color: #374151; }
+        .confirm-ok { background: #6d28d9; color: white; }
+
+        /* ===== Transition & Complete Modals ===== */
+        .transition-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .transition-modal.active { display: flex; }
+        .transition-box {
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            max-width: 460px;
+            width: 90%;
+        }
+        .transition-box h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+        .transition-box p { font-size: 14px; color: #64748b; margin-bottom: 6px; line-height: 1.5; }
+        .transition-feedback {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 0 16px;
+        }
+        .feedback-pass { background: #f0fdf4; color: #16a34a; }
+        .feedback-fail { background: #fef2f2; color: #ef4444; }
+        .transition-btn {
+            background: #6366f1;
+            color: white;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .complete-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .complete-modal.active { display: flex; }
+        .complete-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+        }
+        .complete-emoji { font-size: 56px; margin-bottom: 14px; }
+        .complete-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: #1e293b; }
+        .complete-score { font-size: 42px; font-weight: 900; margin: 12px 0; }
+        .complete-btn {
+            background: #6366f1;
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- INTRO -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-box">
+            <div style="font-size: 52px; margin-bottom: 12px;">🎯</div>
+            <h2>Test Your Knowledge</h2>
+            <p>You'll face 2 realistic scenarios with sneaking patterns. Your goal: spot hidden costs and don't get tricked!</p>
+            <ul class="intro-rules">
+                <li>Scenario 1: A restaurant bill with a sneaky pre-selected gratuity</li>
+                <li>Scenario 2: A website that sneaks consent through cookies and privacy policy</li>
+                <li>Read everything carefully before clicking!</li>
+            </ul>
+            <button class="intro-btn" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 1: Restaurant Gratuity ===== -->
+    <div class="scenario restaurant" id="scenario1">
+        <div class="rest-content">
+            <div class="rest-header">
+                <div class="rest-name">Sweet Basil Cafe</div>
+                <div class="rest-tagline">Fine Dining Experience</div>
+            </div>
+            <div class="rest-bill-card">
+                <div class="rest-bill-title">Your Bill</div>
+                <div class="bill-item"><span>Grilled Salmon</span><span>$24.00</span></div>
+                <div class="bill-item"><span>Caesar Salad</span><span>$12.00</span></div>
+                <div class="bill-item"><span>Sparkling Water</span><span>$4.00</span></div>
+                <hr class="bill-divider">
+                <div class="bill-item"><span>Subtotal</span><span>$40.00</span></div>
+                <div class="bill-item"><span>Tax (8%)</span><span>$3.20</span></div>
+
+                <div class="gratuity-section">
+                    <div class="gratuity-label">Gratuity</div>
+                    <div class="gratuity-sub">Select your preferred gratuity amount</div>
+                    <div class="gratuity-options">
+                        <button class="gratuity-btn" onclick="selectTip(10)" id="tip10">
+                            <div class="gratuity-pct">10%</div>
+                            <div class="gratuity-amt">$4.00</div>
+                        </button>
+                        <button class="gratuity-btn selected" onclick="selectTip(15)" id="tip15">
+                            <div class="gratuity-pct">15%</div>
+                            <div class="gratuity-amt">$6.00</div>
+                        </button>
+                        <button class="gratuity-btn" onclick="selectTip(20)" id="tip20">
+                            <div class="gratuity-pct">20%</div>
+                            <div class="gratuity-amt">$8.00</div>
+                        </button>
+                        <button class="gratuity-btn" onclick="selectTip('custom')" id="tipCustom">
+                            <div class="gratuity-pct">Other</div>
+                            <div class="gratuity-amt">Custom</div>
+                        </button>
+                    </div>
+                    <div class="gratuity-sneaked" id="tipNotice">15% gratuity has been auto-selected</div>
+                    <a class="no-tip-link" onclick="selectTip(0)" id="noTipLink">No gratuity</a>
+                </div>
+
+                <div class="bill-item total">
+                    <span>Total</span>
+                    <span id="billTotal">$49.20</span>
+                </div>
+                <button class="pay-btn" onclick="handlePay()" style="margin-top: 16px;">Pay Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCENARIO 2: Welcome Site — Cookie then Privacy ===== -->
+    <div class="scenario welcome-site" id="scenario2">
+        <div class="welcome-content">
+            <div class="welcome-hero">Welcome.</div>
+            <div class="welcome-sub">Minimal Landing Page Design</div>
+            <button class="welcome-subscribe-btn">Subscribe</button>
+        </div>
+
+        <!-- Overlay -->
+        <div class="modal-overlay" id="modalOverlay"></div>
+
+        <!-- Step A: Cookie Consent -->
+        <div class="cookie-banner" id="cookieBanner">
+            <div class="modal-title">Welcome to Our Website</div>
+            <div class="modal-text">
+                We use cookies and other tracking technologies to improve your browsing experience. By clicking "Continue Browsing", you agree to our <a href="#">Privacy Policy</a> and <a href="#">Cookie Policy</a>.
+            </div>
+            <button class="btn-primary" onclick="handleCookieContinue()">Continue Browsing</button>
+            <button class="btn-secondary" onclick="handleCookieManage()">Manage cookie preferences</button>
+        </div>
+
+        <!-- Step B: Privacy Policy (shown after cookie step) -->
+        <div class="privacy-modal hidden" id="privacyModal">
+            <div class="modal-title">Privacy Policy</div>
+            <div class="modal-text">
+                This is a long paragraph describing the privacy policy. It goes on and on... If you agree, we will collect and store your data.
+            </div>
+            <div class="modal-note">By clicking "Agree", you agree to our privacy policy.</div>
+            <div class="privacy-btns">
+                <button class="priv-btn priv-btn-agree" onclick="handlePrivacyAgree()">Agree</button>
+                <button class="priv-btn priv-btn-refuse" onclick="handlePrivacyRefuse()">Refuse</button>
+                <button class="priv-btn priv-btn-continue" onclick="handlePrivacyContinue()">Continue Browsing</button>
+                <button class="priv-btn priv-btn-back" onclick="handlePrivacyBack()">Back</button>
+            </div>
+        </div>
+
+        <!-- Confirm dialog for Refuse -->
+        <div class="confirm-dialog hidden" id="confirmDialog">
+            <div class="confirm-title">Are you sure you want to refuse?</div>
+            <div class="confirm-btns">
+                <button class="confirm-btn confirm-cancel" onclick="handleConfirmCancel()">Cancel</button>
+                <button class="confirm-btn confirm-ok" onclick="handleConfirmOk()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSITION -->
+    <div class="transition-modal" id="transitionModal">
+        <div class="transition-box">
+            <div style="font-size: 48px; margin-bottom: 12px;" id="transEmoji">✅</div>
+            <h2 id="transTitle">Scenario Complete</h2>
+            <div class="transition-feedback" id="transFeedback"></div>
+            <p id="transExplanation"></p>
+            <br>
+            <button class="transition-btn" id="transBtn" onclick="goToNextStep()">Next →</button>
+        </div>
+    </div>
+
+    <!-- COMPLETE -->
+    <div class="complete-modal" id="completeModal">
+        <div class="complete-box">
+            <div class="complete-emoji" id="finalEmoji">🎉</div>
+            <h2 class="complete-title" id="finalTitle">Test Complete!</h2>
+            <div class="complete-score" id="finalScore"></div>
+            <button class="complete-btn" onclick="finishTest()">Finish</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let selectedTip = 15;
+        // Tracks which step we're on: s1 (gratuity), s2a (cookie), s2b (privacy), done
+        let currentStep = 'intro';
+        let s2CookieScore = 0;
+
+        function startTest() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('scenario1').classList.add('active');
+            currentStep = 's1';
+            notifyInteraction();
+        }
+
+        // ===== SCENARIO 1: Gratuity =====
+        function selectTip(pct) {
+            document.querySelectorAll('.gratuity-btn').forEach(b => b.classList.remove('selected'));
+
+            if (pct === 'custom') {
+                document.getElementById('tipCustom').classList.add('selected');
+                selectedTip = 'custom';
+                document.getElementById('tipNotice').textContent = '';
+                updateTotal(0);
+                return;
+            }
+
+            selectedTip = pct;
+            if (pct === 0) {
+                document.getElementById('tipNotice').textContent = 'No gratuity selected';
+                document.getElementById('tipNotice').style.color = '#16a34a';
+                updateTotal(0);
+            } else {
+                const btn = document.getElementById('tip' + pct);
+                if (btn) btn.classList.add('selected');
+                document.getElementById('tipNotice').textContent = pct + '% gratuity selected';
+                document.getElementById('tipNotice').style.color = '#ef4444';
+                updateTotal(pct);
+            }
+        }
+
+        function updateTotal(pct) {
+            const subtotal = 40;
+            const tax = 3.20;
+            const tip = subtotal * (pct / 100);
+            document.getElementById('billTotal').textContent = '$' + (subtotal + tax + tip).toFixed(2);
+        }
+
+        function handlePay() {
+            const passed = selectedTip === 0;
+            if (passed) score++;
+            currentStep = 's1_done';
+
+            showTransition(
+                passed ? "✅" : "⚠️",
+                "Scenario 1 Complete",
+                passed,
+                passed
+                    ? "You noticed the pre-selected gratuity and removed it before paying."
+                    : "A 15% gratuity ($6.00) was automatically added to your bill without your explicit consent. Always check for pre-selected options!",
+                passed ? "You spotted it!" : "Sneaky gratuity added"
+            );
+        }
+
+        // ===== SCENARIO 2A: Cookie Consent =====
+        function handleCookieContinue() {
+            // "Continue Browsing" sneaks acceptance of all tracking
+            s2CookieScore = 0;
+            currentStep = 's2a_done_fail';
+
+            showTransition(
+                "⚠️",
+                "Cookie Consent",
+                false,
+                '"Continue Browsing" secretly agreed to ALL cookies and tracking. The safe option was "Manage cookie preferences".',
+                "You were sneaked into accepting"
+            );
+        }
+
+        function handleCookieManage() {
+            s2CookieScore = 1;
+            currentStep = 's2a_done_pass';
+
+            showTransition(
+                "✅",
+                "Cookie Consent",
+                true,
+                "You chose to manage preferences instead of clicking the prominent button. Now let's see if you can handle the privacy policy...",
+                "Good catch!"
+            );
+        }
+
+        // ===== SCENARIO 2B: Privacy Policy =====
+        function handlePrivacyAgree() {
+            currentStep = 's2b_done';
+            showTransition(
+                "⚠️",
+                "Privacy Policy",
+                false,
+                "You agreed to the privacy policy which allows the website to collect and store all your data.",
+                "You gave consent"
+            );
+        }
+
+        function handlePrivacyRefuse() {
+            document.getElementById('confirmDialog').classList.remove('hidden');
+        }
+
+        function handleConfirmCancel() {
+            document.getElementById('confirmDialog').classList.add('hidden');
+        }
+
+        function handleConfirmOk() {
+            score++;
+            currentStep = 's2b_done';
+            document.getElementById('confirmDialog').classList.add('hidden');
+            showTransition(
+                "✅",
+                "Privacy Policy",
+                true,
+                'You persisted through the intimidating "Are you sure?" dialog. Websites use this to scare you into accepting.',
+                "You stood firm!"
+            );
+        }
+
+        function handlePrivacyContinue() {
+            currentStep = 's2b_done';
+            showTransition(
+                "⚠️",
+                "Privacy Policy",
+                false,
+                '"Continue Browsing" secretly counts as agreeing to the privacy policy. Always look for an explicit "Refuse" option instead.',
+                "Sneaky agreement!"
+            );
+        }
+
+        function handlePrivacyBack() {
+            currentStep = 's2b_done';
+            showTransition(
+                "⚠️",
+                "Privacy Policy",
+                false,
+                '"Back" takes you away without refusing. The website still considers you as not having opted out. Use "Refuse" to explicitly decline.',
+                "You didn't refuse"
+            );
+        }
+
+        // ===== Transitions =====
+        function showTransition(emoji, title, passed, explanation, feedbackText) {
+            document.getElementById('transEmoji').textContent = emoji;
+            document.getElementById('transTitle').textContent = title;
+
+            const fb = document.getElementById('transFeedback');
+            fb.textContent = feedbackText;
+            fb.className = 'transition-feedback ' + (passed ? 'feedback-pass' : 'feedback-fail');
+
+            document.getElementById('transExplanation').textContent = explanation;
+
+            // Determine next button label
+            if (currentStep === 's2b_done') {
+                document.getElementById('transBtn').textContent = 'See Results →';
+            } else if (currentStep.startsWith('s2a_done')) {
+                document.getElementById('transBtn').textContent = 'Continue →';
+            } else {
+                document.getElementById('transBtn').textContent = 'Next Scenario →';
+            }
+
+            document.getElementById('transitionModal').classList.add('active');
+        }
+
+        function goToNextStep() {
+            document.getElementById('transitionModal').classList.remove('active');
+
+            if (currentStep === 's1_done') {
+                // Move to scenario 2 — cookie step
+                document.getElementById('scenario1').classList.remove('active');
+                document.getElementById('scenario2').classList.add('active');
+                currentStep = 's2a';
+                notifyInteraction();
+            } else if (currentStep.startsWith('s2a_done')) {
+                // Move to privacy policy step (same scenario, swap modals)
+                if (s2CookieScore === 1) score++; // award cookie score
+                document.getElementById('cookieBanner').classList.add('hidden');
+                document.getElementById('privacyModal').classList.remove('hidden');
+                currentStep = 's2b';
+            } else if (currentStep === 's2b_done') {
+                showComplete();
+            }
+        }
+
+        function showComplete() {
+            const total = 3; // gratuity + cookie + privacy
+            const passed = score >= 2;
+            document.getElementById('finalEmoji').textContent = passed ? '🎉' : '💪';
+            document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
+            document.getElementById('finalScore').textContent = score + ' / ' + total;
+            document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
+            document.getElementById('completeModal').classList.add('active');
+        }
+
+        function finishTest() {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'test-complete',
+                    score: score,
+                    total: 3,
+                    passed: score >= 2
+                }, '*');
+            }
+        }
+
+        function notifyInteraction() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'user_interacted' }, '*');
+            }
+        }
+    </script>
+</body>
+</html>
