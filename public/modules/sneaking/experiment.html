@@ -209,19 +209,16 @@
         }
         .cart-item-price span { font-weight: 700; color: #0f172a; }
         .delete-btn {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 8px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 22px;
             cursor: pointer;
+            padding: 6px;
             transition: all 0.15s;
         }
         .delete-btn:hover {
-            background: #dc2626;
-            color: white;
+            color: #dc2626;
         }
 
         .cart-footer {
@@ -337,7 +334,7 @@
                         <div class="cart-item-name">Single School Backpack</div>
                         <div class="cart-item-price">Price: <span>$50</span></div>
                     </div>
-                    <button class="delete-btn">Delete</button>
+                    <button class="delete-btn" title="Remove">🗑️</button>
                 </div>
 
                 <!-- Sneaked item -->
@@ -347,7 +344,7 @@
                         <div class="cart-item-name">Water Cup Holder</div>
                         <div class="cart-item-price">Price: <span>$9.99</span></div>
                     </div>
-                    <button class="delete-btn" onclick="removeSneakedItem()">Delete</button>
+                    <button class="delete-btn" onclick="removeSneakedItem()" title="Remove">🗑️</button>
                 </div>
 
                 <div class="cart-footer">

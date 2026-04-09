@@ -66,7 +66,7 @@
            SCENARIO 1: Restaurant Gratuity
            ======================================== */
         .restaurant {
-            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+            background: linear-gradient(135deg, #1c1917 0%, #292524 40%, #1c1917 100%);
             min-height: 100vh;
             position: relative;
             overflow: hidden;
@@ -75,7 +75,16 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(180, 83, 9, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(161, 98, 7, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(120, 53, 15, 0.12) 0%, transparent 50%);
+        }
+        .restaurant::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='40' cy='40' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
         }
         .rest-content {
             position: relative;
@@ -85,12 +94,12 @@
             padding: 40px 20px;
         }
         .rest-header { text-align: center; margin-bottom: 30px; }
-        .rest-name { font-size: 28px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .rest-name { font-size: 28px; font-weight: 800; color: #fef3c7; margin-bottom: 4px; font-family: Georgia, 'Times New Roman', serif; }
         .rest-tagline {
-            color: #a78bfa;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 2px;
+            color: #d97706;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
         .rest-bill-card {
@@ -141,33 +150,22 @@
             text-align: center;
             transition: all 0.15s;
         }
-        .gratuity-btn:hover { border-color: #a78bfa; background: #f5f3ff; }
-        .gratuity-btn.selected { border-color: #7c3aed; background: #ede9fe; }
+        .gratuity-btn:hover { border-color: #d97706; background: #fffbeb; }
+        .gratuity-btn.selected { border-color: #b45309; background: #fef3c7; }
         .gratuity-pct { font-size: 18px; font-weight: 700; color: #1e293b; }
         .gratuity-amt { font-size: 11px; color: #64748b; margin-top: 2px; }
         .gratuity-sneaked {
-            font-size: 12px;
-            color: #ef4444;
-            font-weight: 600;
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
             text-align: center;
             margin-bottom: 14px;
             min-height: 16px;
         }
-        .no-tip-link {
-            display: block;
-            text-align: center;
-            font-size: 12px;
-            color: #cbd5e1;
-            cursor: pointer;
-            margin-bottom: 16px;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-        .no-tip-link:hover { color: #94a3b8; }
         .pay-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
             color: white;
             font-size: 16px;
             font-weight: 700;
@@ -448,11 +446,6 @@
             <div style="font-size: 52px; margin-bottom: 12px;">🎯</div>
             <h2>Test Your Knowledge</h2>
             <p>You'll face 2 realistic scenarios with sneaking patterns. Your goal: spot hidden costs and don't get tricked!</p>
-            <ul class="intro-rules">
-                <li>Scenario 1: A restaurant bill with a sneaky pre-selected gratuity</li>
-                <li>Scenario 2: A website that sneaks consent through cookies and privacy policy</li>
-                <li>Read everything carefully before clicking!</li>
-            </ul>
             <button class="intro-btn" onclick="startTest()">Start Test</button>
         </div>
     </div>
@@ -461,6 +454,7 @@
     <div class="scenario restaurant" id="scenario1">
         <div class="rest-content">
             <div class="rest-header">
+                <div style="font-size: 40px; margin-bottom: 8px;">☕🍽️</div>
                 <div class="rest-name">Sweet Basil Cafe</div>
                 <div class="rest-tagline">Fine Dining Experience</div>
             </div>
@@ -471,11 +465,12 @@
                 <div class="bill-item"><span>Sparkling Water</span><span>$4.00</span></div>
                 <hr class="bill-divider">
                 <div class="bill-item"><span>Subtotal</span><span>$40.00</span></div>
-                <div class="bill-item"><span>Tax (8%)</span><span>$3.20</span></div>
+                <div class="bill-item"><span>Other fees</span><span>$6.00</span></div>
+                <div class="bill-item"><span>Tax</span><span>$3.00</span></div>
+                <div class="bill-item"><span>15% Auto Tip</span><span>$3.00</span></div>
 
                 <div class="gratuity-section">
-                    <div class="gratuity-label">Gratuity</div>
-                    <div class="gratuity-sub">Select your preferred gratuity amount</div>
+                    <div class="gratuity-label">Add Gratuity</div>
                     <div class="gratuity-options">
                         <button class="gratuity-btn" onclick="selectTip(10)" id="tip10">
                             <div class="gratuity-pct">10%</div>
@@ -494,13 +489,12 @@
                             <div class="gratuity-amt">Custom</div>
                         </button>
                     </div>
-                    <div class="gratuity-sneaked" id="tipNotice">15% gratuity has been auto-selected</div>
-                    <a class="no-tip-link" onclick="selectTip(0)" id="noTipLink">No gratuity</a>
+                    <div class="gratuity-sneaked" id="tipNotice"></div>
                 </div>
 
                 <div class="bill-item total">
                     <span>Total</span>
-                    <span id="billTotal">$49.20</span>
+                    <span id="billTotal">$52.00</span>
                 </div>
                 <button class="pay-btn" onclick="handlePay()" style="margin-top: 16px;">Pay Now</button>
             </div>
@@ -522,7 +516,7 @@
         <div class="cookie-banner" id="cookieBanner">
             <div class="modal-title">Welcome to Our Website</div>
             <div class="modal-text">
-                We use cookies and other tracking technologies to improve your browsing experience. By clicking "Continue Browsing", you agree to our <a href="#">Privacy Policy</a> and <a href="#">Cookie Policy</a>.
+                We use cookies and other tracking technologies to improve your browsing experience. By clicking "Continue Browsing", you agree to our <a href="#" onclick="event.preventDefault(); showPrivacyFromCookie()">Privacy Policy</a> and <a href="#" onclick="event.preventDefault(); showPrivacyFromCookie()">Cookie Policy</a>.
             </div>
             <button class="btn-primary" onclick="handleCookieContinue()">Continue Browsing</button>
             <button class="btn-secondary" onclick="handleCookieManage()">Manage cookie preferences</button>
@@ -531,10 +525,14 @@
         <!-- Step B: Privacy Policy (shown after cookie step) -->
         <div class="privacy-modal hidden" id="privacyModal">
             <div class="modal-title">Privacy Policy</div>
-            <div class="modal-text">
-                This is a long paragraph describing the privacy policy. It goes on and on... If you agree, we will collect and store your data.
+            <div class="modal-text" style="max-height: 180px; overflow-y: auto; font-size: 12px; line-height: 1.6; text-align: left; padding-right: 8px;">
+                <p style="margin-bottom: 8px;"><strong>1. Information We Collect</strong><br>We collect personal information you provide directly to us, such as your name, email address, postal address, phone number, and payment information when you register, make a purchase, or communicate with us.</p>
+                <p style="margin-bottom: 8px;"><strong>2. Use of Information</strong><br>We use the information we collect to provide and improve our services, process transactions, send promotional communications, and personalize your experience. We may share your data with third-party partners for marketing and advertising purposes.</p>
+                <p style="margin-bottom: 8px;"><strong>3. Cookies & Tracking</strong><br>We use cookies, web beacons, and similar tracking technologies to collect information about your browsing activity. This includes pages visited, links clicked, and items viewed. Third-party advertisers may also place cookies on your device.</p>
+                <p style="margin-bottom: 8px;"><strong>4. Data Sharing</strong><br>We may share your personal information with affiliated companies, service providers, and business partners. We may also disclose information in response to legal requests or to protect our rights and safety.</p>
+                <p style="margin-bottom: 0;"><strong>5. Your Choices</strong><br>You may opt out of promotional emails by following the unsubscribe instructions. However, opting out may limit your access to certain features of our services.</p>
             </div>
-            <div class="modal-note">By clicking "Agree", you agree to our privacy policy.</div>
+            <div class="modal-note">By clicking "Agree", you consent to the collection, use, and sharing of your data as described above.</div>
             <div class="privacy-btns">
                 <button class="priv-btn priv-btn-agree" onclick="handlePrivacyAgree()">Agree</button>
                 <button class="priv-btn priv-btn-refuse" onclick="handlePrivacyRefuse()">Refuse</button>
@@ -603,27 +601,28 @@
 
             selectedTip = pct;
             if (pct === 0) {
-                document.getElementById('tipNotice').textContent = 'No gratuity selected';
-                document.getElementById('tipNotice').style.color = '#16a34a';
+                document.getElementById('tipNotice').textContent = '';
+                document.getElementById('tipNotice').style.color = '#94a3b8';
                 updateTotal(0);
             } else {
                 const btn = document.getElementById('tip' + pct);
                 if (btn) btn.classList.add('selected');
-                document.getElementById('tipNotice').textContent = pct + '% gratuity selected';
-                document.getElementById('tipNotice').style.color = '#ef4444';
+                document.getElementById('tipNotice').textContent = '';
+                document.getElementById('tipNotice').style.color = '#94a3b8';
                 updateTotal(pct);
             }
         }
 
         function updateTotal(pct) {
-            const subtotal = 40;
-            const tax = 3.20;
-            const tip = subtotal * (pct / 100);
-            document.getElementById('billTotal').textContent = '$' + (subtotal + tax + tip).toFixed(2);
+            // Base: subtotal $40 + other fees $6 + tax $3 + auto tip $3 = $52
+            const base = 52;
+            const tip = 40 * (pct / 100);
+            document.getElementById('billTotal').textContent = '$' + (base + tip).toFixed(2);
         }
 
         function handlePay() {
-            const passed = selectedTip === 0;
+            // Pass if user did NOT add additional gratuity (since there's already a 15% auto tip baked in)
+            const passed = selectedTip === 0 || selectedTip === 'custom';
             if (passed) score++;
             currentStep = 's1_done';
 
@@ -632,10 +631,18 @@
                 "Scenario 1 Complete",
                 passed,
                 passed
-                    ? "You noticed the pre-selected gratuity and removed it before paying."
-                    : "A 15% gratuity ($6.00) was automatically added to your bill without your explicit consent. Always check for pre-selected options!",
-                passed ? "You spotted it!" : "Sneaky gratuity added"
+                    ? "You noticed the sneaky auto-tip already included in the bill and avoided paying extra gratuity on top."
+                    : "A 15% auto tip ($3.00) was already included in your bill, but you added even more gratuity on top! Always read the full bill before tipping.",
+                passed ? "You spotted it!" : "Double gratuity added"
             );
+        }
+
+        // Show privacy policy when clicking links in cookie banner
+        let cameFromCookie = false;
+        function showPrivacyFromCookie() {
+            cameFromCookie = true;
+            document.getElementById('cookieBanner').classList.add('hidden');
+            document.getElementById('privacyModal').classList.remove('hidden');
         }
 
         // ===== SCENARIO 2A: Cookie Consent =====
@@ -711,6 +718,13 @@
         }
 
         function handlePrivacyBack() {
+            if (cameFromCookie) {
+                // Go back to cookie banner
+                cameFromCookie = false;
+                document.getElementById('privacyModal').classList.add('hidden');
+                document.getElementById('cookieBanner').classList.remove('hidden');
+                return;
+            }
             currentStep = 's2b_done';
             showTransition(
                 "⚠️",
