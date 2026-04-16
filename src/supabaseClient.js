@@ -145,6 +145,26 @@ export async function saveFeedback({ name, message }) {
 }
 
 // =============================================
+// Save Survey Response
+// =============================================
+export async function saveSurveyResponse(responses) {
+  try {
+    const { error } = await supabase
+      .from('survey_responses')
+      .insert({
+        session_id: sessionId,
+        responses,
+      });
+
+    if (error) console.error('Save survey error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Save survey failed:', err);
+    return false;
+  }
+}
+
+// =============================================
 // Track Phase Actions
 // =============================================
 export async function trackPhaseAction({ moduleId, moduleTitle, phase, action }) {

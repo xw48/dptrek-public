@@ -22,7 +22,12 @@ export function AppProvider({ children }) {
   // Completed modules
   const [completedModules, setCompletedModules] = useState(() => {
     const saved = Cookies.get('dptrek_progress');
-    return saved ? JSON.parse(saved) : [];
+    try { return saved ? JSON.parse(saved) : []; } catch { return []; }
+  });
+
+  // Survey completed
+  const [surveyCompleted, setSurveyCompleted] = useState(() => {
+    return Cookies.get('dptrek_survey') === 'done';
   });
 
   // Save text size to cookie
@@ -44,6 +49,13 @@ export function AppProvider({ children }) {
   useEffect(() => {
     Cookies.set('dptrek_progress', JSON.stringify(completedModules), { expires: 365 });
   }, [completedModules]);
+
+  // Save survey status to cookie
+  useEffect(() => {
+    if (surveyCompleted) {
+      Cookies.set('dptrek_survey', 'done', { expires: 365 });
+    }
+  }, [surveyCompleted]);
 
   // Init session once on app load
   useEffect(() => {
@@ -108,6 +120,8 @@ export function AppProvider({ children }) {
     setCompletedModules,
     toggleComplete,
     textSizeScale,
+    surveyCompleted,
+    setSurveyCompleted,
   };
 
   return (

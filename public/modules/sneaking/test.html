@@ -465,9 +465,15 @@
                 <div class="bill-item"><span>Sparkling Water</span><span>$4.00</span></div>
                 <hr class="bill-divider">
                 <div class="bill-item"><span>Subtotal</span><span>$40.00</span></div>
-                <div class="bill-item"><span>Other fees</span><span>$6.00</span></div>
-                <div class="bill-item"><span>Tax</span><span>$3.00</span></div>
-                <div class="bill-item"><span>15% Auto Tip</span><span>$3.00</span></div>
+                <div class="bill-item" style="cursor: pointer;" onclick="toggleFees()">
+                    <span>Other fees ▸</span>
+                    <span>$12.00</span>
+                </div>
+                <div id="feeDetails" style="display: none; padding-left: 16px;">
+                    <div class="bill-item" style="font-size: 13px; color: #94a3b8;"><span>Service fee</span><span>$3.00</span></div>
+                    <div class="bill-item" style="font-size: 13px; color: #94a3b8;"><span>Tax</span><span>$3.00</span></div>
+                    <div class="bill-item" style="font-size: 13px; color: #94a3b8;"><span>15% Auto Tip</span><span>$6.00</span></div>
+                </div>
 
                 <div class="gratuity-section">
                     <div class="gratuity-label">Add Gratuity</div>
@@ -488,6 +494,14 @@
                             <div class="gratuity-pct">Other</div>
                             <div class="gratuity-amt">Custom</div>
                         </button>
+                    </div>
+                    <div id="customTipBox" style="display: none; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748b;">$</span>
+                            <input type="number" id="customTipInput" placeholder="0.00" min="0" step="0.01"
+                                style="flex: 1; padding: 8px 12px; border: 2px solid #d97706; border-radius: 8px; font-size: 14px; outline: none; color: #1e293b;"
+                                oninput="updateCustomTip()">
+                        </div>
                     </div>
                     <div class="gratuity-sneaked" id="tipNotice"></div>
                 </div>
@@ -519,7 +533,6 @@
                 We use cookies and other tracking technologies to improve your browsing experience. By clicking "Continue Browsing", you agree to our <a href="#" onclick="event.preventDefault(); showPrivacyFromCookie()">Privacy Policy</a> and <a href="#" onclick="event.preventDefault(); showPrivacyFromCookie()">Cookie Policy</a>.
             </div>
             <button class="btn-primary" onclick="handleCookieContinue()">Continue Browsing</button>
-            <button class="btn-secondary" onclick="handleCookieManage()">Manage cookie preferences</button>
         </div>
 
         <!-- Step B: Privacy Policy (shown after cookie step) -->
@@ -557,8 +570,6 @@
             <div style="font-size: 48px; margin-bottom: 12px;" id="transEmoji">✅</div>
             <h2 id="transTitle">Scenario Complete</h2>
             <div class="transition-feedback" id="transFeedback"></div>
-            <p id="transExplanation"></p>
-            <br>
             <button class="transition-btn" id="transBtn" onclick="goToNextStep()">Next →</button>
         </div>
     </div>
@@ -579,6 +590,7 @@
         // Tracks which step we're on: s1 (gratuity), s2a (cookie), s2b (privacy), done
         let currentStep = 'intro';
         let s2CookieScore = 0;
+        let s2PrivacyScore = 0;
 
         function startTest() {
             document.getElementById('introScreen').style.display = 'none';
@@ -588,14 +600,26 @@
         }
 
         // ===== SCENARIO 1: Gratuity =====
+        function toggleFees() {
+            const details = document.getElementById('feeDetails');
+            const isOpen = details.style.display !== 'none';
+            details.style.display = isOpen ? 'none' : 'block';
+            // Update arrow
+            const label = event.currentTarget.querySelector('span');
+            label.innerHTML = isOpen ? 'Other fees ▸' : 'Other fees ▾';
+        }
+
         function selectTip(pct) {
             document.querySelectorAll('.gratuity-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('customTipBox').style.display = 'none';
 
             if (pct === 'custom') {
                 document.getElementById('tipCustom').classList.add('selected');
+                document.getElementById('customTipBox').style.display = 'block';
+                document.getElementById('customTipInput').focus();
                 selectedTip = 'custom';
                 document.getElementById('tipNotice').textContent = '';
-                updateTotal(0);
+                updateCustomTip();
                 return;
             }
 
@@ -620,6 +644,12 @@
             document.getElementById('billTotal').textContent = '$' + (base + tip).toFixed(2);
         }
 
+        function updateCustomTip() {
+            const val = parseFloat(document.getElementById('customTipInput').value) || 0;
+            const base = 52;
+            document.getElementById('billTotal').textContent = '$' + (base + val).toFixed(2);
+        }
+
         function handlePay() {
             // Pass if user did NOT add additional gratuity (since there's already a 15% auto tip baked in)
             const passed = selectedTip === 0 || selectedTip === 'custom';
@@ -630,9 +660,6 @@
                 passed ? "✅" : "⚠️",
                 "Scenario 1 Complete",
                 passed,
-                passed
-                    ? "You noticed the sneaky auto-tip already included in the bill and avoided paying extra gratuity on top."
-                    : "A 15% auto tip ($3.00) was already included in your bill, but you added even more gratuity on top! Always read the full bill before tipping.",
                 passed ? "You spotted it!" : "Double gratuity added"
             );
         }
@@ -651,38 +678,20 @@
             s2CookieScore = 0;
             currentStep = 's2a_done_fail';
 
-            showTransition(
-                "⚠️",
-                "Cookie Consent",
-                false,
-                '"Continue Browsing" secretly agreed to ALL cookies and tracking. The safe option was "Manage cookie preferences".',
-                "You were sneaked into accepting"
-            );
+            showTransition("⚠️", "Cookie Consent", false, "You were sneaked into accepting");
         }
 
         function handleCookieManage() {
             s2CookieScore = 1;
             currentStep = 's2a_done_pass';
 
-            showTransition(
-                "✅",
-                "Cookie Consent",
-                true,
-                "You chose to manage preferences instead of clicking the prominent button. Now let's see if you can handle the privacy policy...",
-                "Good catch!"
-            );
+            showTransition("✅", "Cookie Consent", true, "Good catch!");
         }
 
         // ===== SCENARIO 2B: Privacy Policy =====
         function handlePrivacyAgree() {
             currentStep = 's2b_done';
-            showTransition(
-                "⚠️",
-                "Privacy Policy",
-                false,
-                "You agreed to the privacy policy which allows the website to collect and store all your data.",
-                "You gave consent"
-            );
+            showTransition("⚠️", "Privacy Policy", false, "You gave consent");
         }
 
         function handlePrivacyRefuse() {
@@ -694,27 +703,15 @@
         }
 
         function handleConfirmOk() {
-            score++;
+            s2PrivacyScore = 1;
             currentStep = 's2b_done';
             document.getElementById('confirmDialog').classList.add('hidden');
-            showTransition(
-                "✅",
-                "Privacy Policy",
-                true,
-                'You persisted through the intimidating "Are you sure?" dialog. Websites use this to scare you into accepting.',
-                "You stood firm!"
-            );
+            showTransition("✅", "Privacy Policy", true, "You stood firm!");
         }
 
         function handlePrivacyContinue() {
             currentStep = 's2b_done';
-            showTransition(
-                "⚠️",
-                "Privacy Policy",
-                false,
-                '"Continue Browsing" secretly counts as agreeing to the privacy policy. Always look for an explicit "Refuse" option instead.',
-                "Sneaky agreement!"
-            );
+            showTransition("⚠️", "Privacy Policy", false, "Sneaky agreement!");
         }
 
         function handlePrivacyBack() {
@@ -726,25 +723,17 @@
                 return;
             }
             currentStep = 's2b_done';
-            showTransition(
-                "⚠️",
-                "Privacy Policy",
-                false,
-                '"Back" takes you away without refusing. The website still considers you as not having opted out. Use "Refuse" to explicitly decline.',
-                "You didn't refuse"
-            );
+            showTransition("⚠️", "Privacy Policy", false, "You didn't refuse");
         }
 
         // ===== Transitions =====
-        function showTransition(emoji, title, passed, explanation, feedbackText) {
+        function showTransition(emoji, title, passed, feedbackText) {
             document.getElementById('transEmoji').textContent = emoji;
             document.getElementById('transTitle').textContent = title;
 
             const fb = document.getElementById('transFeedback');
             fb.textContent = feedbackText;
             fb.className = 'transition-feedback ' + (passed ? 'feedback-pass' : 'feedback-fail');
-
-            document.getElementById('transExplanation').textContent = explanation;
 
             // Determine next button label
             if (currentStep === 's2b_done') {
@@ -769,7 +758,7 @@
                 notifyInteraction();
             } else if (currentStep.startsWith('s2a_done')) {
                 // Move to privacy policy step (same scenario, swap modals)
-                if (s2CookieScore === 1) score++; // award cookie score
+                // cookie score deferred to end of scenario 2
                 document.getElementById('cookieBanner').classList.add('hidden');
                 document.getElementById('privacyModal').classList.remove('hidden');
                 currentStep = 's2b';
@@ -779,7 +768,9 @@
         }
 
         function showComplete() {
-            const total = 3; // gratuity + cookie + privacy
+            // Award scenario 2 point only if both cookie AND privacy passed
+            if (s2CookieScore === 1 && s2PrivacyScore === 1) score++;
+            const total = 2; // gratuity + cookie/privacy combined
             const passed = score >= 2;
             document.getElementById('finalEmoji').textContent = passed ? '🎉' : '💪';
             document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
@@ -793,15 +784,15 @@
                 window.parent.postMessage({
                     type: 'test-complete',
                     score: score,
-                    total: 3,
+                    total: 2,
                     passed: score >= 2
-                }, '*');
+                }, window.location.origin);
             }
         }
 
         function notifyInteraction() {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'user_interacted' }, '*');
+                window.parent.postMessage({ type: 'user_interacted' }, window.location.origin);
             }
         }
     </script>

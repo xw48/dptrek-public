@@ -398,7 +398,7 @@
 
         function notifyComplete(result) {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+                window.parent.postMessage({ type: 'task_complete', result: result }, window.location.origin);
             }
         }
     </script>

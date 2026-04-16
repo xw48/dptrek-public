@@ -227,14 +227,14 @@
             }
             document.getElementById('successMessage').classList.add('active');
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'experiment-complete', choice: choice }, '*');
+                window.parent.postMessage({ type: 'experiment-complete', choice: choice }, window.location.origin);
             }
         }
         
         function notifyInteraction() {
             // Notify parent that user interacted
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'user_interacted' }, '*');
+                window.parent.postMessage({ type: 'user_interacted' }, window.location.origin);
             }
         }
     </script>

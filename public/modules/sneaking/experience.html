@@ -269,9 +269,9 @@
             margin-bottom: 8px;
         }
         .cart-item-price {
-            font-size: 17px;
-            font-weight: 700;
-            color: #0f172a;
+            font-size: 14px;
+            font-weight: 400;
+            color: #475569;
         }
         .cart-item-delete {
             background: none;
@@ -313,9 +313,9 @@
             margin-bottom: 10px;
         }
         .summary-row.total {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
+            font-size: 15px;
+            font-weight: 400;
+            color: #475569;
             border-top: 2px solid #e2e8f0;
             padding-top: 12px;
             margin-top: 8px;
@@ -563,7 +563,7 @@
 
         function notifyComplete(result) {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+                window.parent.postMessage({ type: 'task_complete', result: result }, window.location.origin);
             }
         }
     </script>

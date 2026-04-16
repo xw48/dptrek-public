@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { trackHomePageLoad, trackTextSizeChange, trackModuleClick } from "../posthog";
 
 // Supabase Database
-import { saveFeedback } from "../supabaseClient";
+import { saveFeedback, saveSurveyResponse } from "../supabaseClient";
 
 // Centralized state
 import { useAppContext } from "../AppContext";
@@ -72,14 +72,116 @@ export default function Home() {
     highContrast, setHighContrast,
     completedModules, toggleComplete,
     textSizeScale,
+    surveyCompleted, setSurveyCompleted,
   } = useAppContext();
-  
+
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [showWelcomeHelper, setShowWelcomeHelper] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [surveyAnswers, setSurveyAnswers] = useState({});
+  const [surveySubmitting, setSurveySubmitting] = useState(false);
+
+  const allModulesComplete = completedModules.length >= MODULES.length;
+
+  const SURVEY_SECTIONS = [
+    {
+      title: "Enjoyment",
+      questions: [
+        "I had fun in the training.",
+        "I found the training enjoyable.",
+        "The actual process of the training was pleasant.",
+        "The training experience was pleasurable.",
+      ],
+    },
+    {
+      title: "Confidence",
+      questions: [
+        "I am confident of my ability to make sense of the dark pattern modules in the training materials.",
+        "I am confident that I can identify different types of dark patterns in real life.",
+        "I believe that I can deal with dark patterns if I see them in the future.",
+      ],
+    },
+    {
+      title: "Perceived Ease of Use",
+      questions: [
+        "I felt frustrated while taking this training.",
+        "I found this training confusing to learn.",
+        "Using this training was taxing.",
+      ],
+    },
+    {
+      title: "Aesthetic Appeal",
+      questions: [
+        "This training was attractive.",
+        "This training was aesthetically appealing.",
+        "This training appealed to my senses.",
+      ],
+    },
+    {
+      title: "Reward",
+      questions: [
+        "Taking this training was worthwhile.",
+        "My experience with this training was rewarding.",
+        "I felt interested in this training experience.",
+      ],
+    },
+    {
+      title: "Attitude of Coping with Dark Patterns",
+      questions: [
+        "Coping with Dark Patterns is unnecessary.",
+        "Coping with Dark Patterns is wise.",
+        "Coping with Dark Patterns is useful.",
+        "Coping with Dark Patterns is not helpful.",
+        "Coping with Dark Patterns is rewarding.",
+      ],
+    },
+    {
+      title: "Risk of Dark Patterns",
+      questions: [
+        "In general, it would be risky to fall into dark patterns.",
+        "There would be high potential for loss if I fall into dark patterns.",
+        "There would be too much uncertainty associated with falling into dark patterns.",
+        "Dark patterns would create many unexpected problems.",
+      ],
+    },
+    {
+      title: "Future Behavioral Intention",
+      questions: [
+        "I plan to take the training if such training is available in future.",
+        "I intend to continue to take the training if such training is available in future.",
+        "I expect the training to continue if such training is available in future.",
+      ],
+    },
+  ];
+
+  const SCALE_OPTIONS = ["Strongly disagree", "Somewhat disagree", "Neutral", "Somewhat agree", "Strongly agree"];
+
+  const totalQuestions = SURVEY_SECTIONS.reduce((sum, s) => sum + s.questions.length, 0);
+  const answeredQuestions = Object.keys(surveyAnswers).length;
+
+  const handleSurveySubmit = async () => {
+    if (answeredQuestions < totalQuestions) {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+    setSurveySubmitting(true);
+    const formatted = {};
+    SURVEY_SECTIONS.forEach((section) => {
+      formatted[section.title] = {};
+      section.questions.forEach((q) => {
+        formatted[section.title][q] = surveyAnswers[q] || null;
+      });
+    });
+    await saveSurveyResponse(formatted);
+    setSurveyCompleted(true);
+    setShowSurvey(false);
+    setSurveySubmitting(false);
+    alert("Thank you for completing the survey!");
+  };
 
   const navigate = useNavigate();
 
@@ -485,6 +587,46 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Survey Banner — shows when all modules complete */}
+        {allModulesComplete && !surveyCompleted && (
+          <section className="mb-12" aria-label="Post-Training Survey">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-8 shadow-md">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center text-white text-3xl flex-shrink-0">
+                    🎉
+                  </div>
+                  <div>
+                    <h3 className={`${textSizeScale.cardTitle} font-bold text-gray-900`}>
+                      Congratulations! You've Completed All Modules!
+                    </h3>
+                    <p className={`${textSizeScale.cardText} text-gray-600 mt-1`}>
+                      Please take a short survey to help us improve this training for others.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="xl"
+                  onClick={() => setShowSurvey(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white whitespace-nowrap flex-shrink-0 shadow-lg"
+                >
+                  📋 Take Survey
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {allModulesComplete && surveyCompleted && (
+          <section className="mb-12" aria-label="Survey Completed">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 text-center shadow-md">
+              <p className={`${textSizeScale.cardText} text-green-800 font-semibold`}>
+                ✅ Thank you! You've completed all modules and the survey.
+              </p>
+            </div>
+          </section>
+        )}
+
         {/* Motivational Quote */}
         <section className="mb-16 text-center" aria-label="Inspirational Message">
           <div className="max-w-3xl mx-auto bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200 rounded-2xl p-8 shadow-md">
@@ -563,16 +705,26 @@ export default function Home() {
             <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '32px 32px'}} />
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h3 className="text-2xl font-bold text-white mb-1">Ready to Test Your Knowledge?</h3>
-                <p className="text-purple-100 text-base">Complete all modules and take our assessment!</p>
+                <h3 className="text-2xl font-bold text-white mb-1">
+                  {surveyCompleted ? "Survey Completed!" : "Ready to Share Your Feedback?"}
+                </h3>
+                <p className="text-purple-100 text-base">
+                  {surveyCompleted
+                    ? "Thank you for helping us improve this training."
+                    : allModulesComplete
+                      ? "You've completed all modules — take the survey now!"
+                      : "Complete all modules to unlock the survey."}
+                </p>
               </div>
               <Button
                 variant="secondary"
                 size="lg"
                 className="bg-white hover:bg-purple-50 text-purple-700 font-bold shadow-lg whitespace-nowrap px-8 shrink-0"
                 aria-label="Take the After-Learning Assessment Survey"
+                onClick={() => allModulesComplete && !surveyCompleted && setShowSurvey(true)}
+                disabled={!allModulesComplete || surveyCompleted}
               >
-                🎯 Take Assessment Survey
+                {surveyCompleted ? "✅ Survey Done" : "📋 Take Survey"}
               </Button>
             </div>
           </div>
@@ -761,6 +913,101 @@ export default function Home() {
                 <p className="text-blue-800">
                   <strong>💡 Tip:</strong> You can also write down the website address and share it in person or over the phone!
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Survey Modal */}
+      {showSurvey && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl max-h-[90vh] flex flex-col">
+            {/* Survey Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 rounded-t-2xl flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">📋 Training Survey</h2>
+                <button
+                  onClick={() => setShowSurvey(false)}
+                  className="text-white hover:text-gray-200 text-3xl font-bold"
+                  aria-label="Close survey"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-purple-100 mt-2 text-base leading-relaxed">
+                You have completed the dark pattern education. Please indicate your agreement or disagreement with each statement. Thank you for your participation!
+              </p>
+              <div className="mt-3 bg-white bg-opacity-20 rounded-lg px-4 py-2 inline-block">
+                <span className="text-white font-semibold text-sm">
+                  {answeredQuestions} / {totalQuestions} answered
+                </span>
+              </div>
+            </div>
+
+            {/* Survey Body — scrollable */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              {SURVEY_SECTIONS.map((section, sIdx) => (
+                <div key={sIdx}>
+                  <h3 className={`${textSizeScale.cardTitle} font-bold text-gray-900 mb-4 pb-2 border-b-2 border-purple-200`}>
+                    {section.title}
+                  </h3>
+                  <div className="space-y-5">
+                    {section.questions.map((question, qIdx) => {
+                      const key = question;
+                      return (
+                        <div key={qIdx} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                          <p className={`${textSizeScale.cardText} text-gray-800 font-medium mb-3`}>
+                            {question}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {SCALE_OPTIONS.map((option, oIdx) => (
+                              <button
+                                key={oIdx}
+                                onClick={() => setSurveyAnswers(prev => ({ ...prev, [key]: option }))}
+                                className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition border-2 ${
+                                  surveyAnswers[key] === option
+                                    ? "bg-purple-600 text-white border-purple-600 shadow-md"
+                                    : "bg-white text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50"
+                                }`}
+                              >
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Survey Footer */}
+            <div className="flex-shrink-0 p-6 border-t-2 border-gray-200 bg-gray-50 rounded-b-2xl">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm text-gray-500">
+                  {answeredQuestions < totalQuestions
+                    ? `${totalQuestions - answeredQuestions} questions remaining`
+                    : "All questions answered!"}
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => setShowSurvey(false)}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    size="md"
+                    onClick={handleSurveySubmit}
+                    disabled={surveySubmitting}
+                    className={answeredQuestions >= totalQuestions ? "bg-green-600 hover:bg-green-700" : ""}
+                  >
+                    {surveySubmitting ? "Submitting..." : "Submit Survey"}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

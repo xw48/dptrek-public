@@ -157,7 +157,6 @@
             <div style="font-size:48px;margin-bottom:12px;" id="transEmoji"></div>
             <h2 id="transTitle"></h2>
             <div class="feedback-badge" id="transBadge"></div>
-            <p id="transText"></p>
             <button class="modal-btn" onclick="goNext()" id="transBtn">Next Scenario →</button>
         </div>
     </div>
@@ -168,7 +167,6 @@
             <div style="font-size:48px;margin-bottom:12px;" id="finalEmoji"></div>
             <h2 id="finalTitle"></h2>
             <div class="complete-score" id="finalScore"></div>
-            <p id="finalText"></p>
             <button class="modal-btn" onclick="finishTest()">Finish</button>
         </div>
     </div>
@@ -186,18 +184,15 @@
             const consented = document.getElementById('dataConsent').checked;
             if (!consented) {
                 score++;
-                showTransition('✅', 'Scenario 1 Complete', 'You unchecked it!', 'pass',
-                    'Great job! You noticed the pre-checked "Agree of data usage" and unchecked it before submitting.');
+                showTransition('✅', 'Scenario 1 Complete', 'You unchecked it!', 'pass');
             } else {
-                showTransition('⚠️', 'Scenario 1 Complete', 'You left it checked', 'fail',
-                    'You submitted with "Agree of data usage" still checked. This means the website can use your data. Always look for pre-checked boxes before clicking Submit.');
+                showTransition('⚠️', 'Scenario 1 Complete', 'You left it checked', 'fail');
             }
         }
 
         // SCENARIO 2: Cookie settings
         function handleS2AcceptAll() {
-            showTransition('⚠️', 'Scenario 2 Complete', 'You accepted all cookies', 'fail',
-                'You clicked "Accept All" which enables Analytics and Marketing cookies. Instead, you should uncheck the non-essential cookies and click "Submit".');
+            showTransition('⚠️', 'Scenario 2 Complete', 'You accepted all cookies', 'fail');
         }
 
         function handleS2Submit() {
@@ -206,25 +201,21 @@
 
             if (!analytics && !marketing) {
                 score++;
-                showTransition('✅', 'Scenario 2 Complete', 'You unchecked both!', 'pass',
-                    'Excellent! You unchecked both Analytics and Marketing cookies, keeping only the essential ones.');
+                showTransition('✅', 'Scenario 2 Complete', 'You unchecked both!', 'pass');
             } else if (!analytics || !marketing) {
                 // Partial — give credit
                 score++;
-                showTransition('👍', 'Scenario 2 Complete', 'Partially correct', 'pass',
-                    'You unchecked one of the non-essential cookies. Ideally, uncheck both Analytics and Marketing cookies to protect your privacy.');
+                showTransition('👍', 'Scenario 2 Complete', 'Partially correct', 'pass');
             } else {
-                showTransition('⚠️', 'Scenario 2 Complete', 'Both still checked', 'fail',
-                    'You submitted with Analytics and Marketing cookies still checked. These allow the website to track your behavior and show targeted ads.');
+                showTransition('⚠️', 'Scenario 2 Complete', 'Both still checked', 'fail');
             }
         }
 
-        function showTransition(emoji, title, badge, badgeType, text) {
+        function showTransition(emoji, title, badge, badgeType) {
             document.getElementById('transEmoji').textContent = emoji;
             document.getElementById('transTitle').textContent = title;
             document.getElementById('transBadge').textContent = badge;
             document.getElementById('transBadge').className = 'feedback-badge ' + badgeType;
-            document.getElementById('transText').textContent = text;
 
             // Change button text based on whether this is the last scenario
             const isLast = document.getElementById('scenario2').classList.contains('active');
@@ -250,9 +241,6 @@
             document.getElementById('finalTitle').textContent = passed ? 'Excellent Work!' : 'Good Effort!';
             document.getElementById('finalScore').textContent = score + ' / 2';
             document.getElementById('finalScore').style.color = passed ? '#16a34a' : '#f59e0b';
-            document.getElementById('finalText').textContent = passed
-                ? 'You successfully identified pre-selected options in both scenarios! You now know how to spot Interface Interference.'
-                : 'Keep practicing! Always look for pre-checked boxes and read every option before clicking Submit or Accept.';
             document.getElementById('completeModal').classList.add('active');
         }
 
@@ -263,7 +251,7 @@
                     score: score,
                     total: 2,
                     passed: score >= 2
-                }, '*');
+                }, window.location.origin);
             }
         }
     </script>

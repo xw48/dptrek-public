@@ -131,35 +131,64 @@
         }
         .error-msg.active { display: block; }
 
-        /* Spam notifications */
+        /* iMessage-style spam notifications */
         .spam-stack {
             display: none;
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 100;
-            max-width: 300px;
+            max-width: 320px;
+            width: 90%;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
         }
         .spam-stack.active { display: block; }
-        .spam-item {
-            background: white;
-            border-radius: 10px;
-            padding: 14px 18px;
+        .sms-notif {
+            background: #f2f2f7;
+            border-radius: 20px;
             margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-left: 4px solid #f59e0b;
-            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+            overflow: hidden;
+            animation: slideDown 0.4s ease-out;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .spam-item-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-        .spam-item-text { font-size: 11px; color: #64748b; line-height: 1.4; }
+        .sms-notif-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px 6px;
+        }
+        .sms-notif-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a1a1aa, #71717a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .sms-notif-sender { font-size: 14px; font-weight: 600; color: #1c1c1e; }
+        .sms-notif-time { font-size: 11px; color: #8e8e93; margin-left: auto; }
+        .sms-notif-body { padding: 2px 14px 12px; }
+        .sms-notif-bubble {
+            background: #e5e5ea;
+            border-radius: 16px 16px 16px 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #1c1c1e;
+            line-height: 1.4;
+        }
 
-        /* Result overlay */
+        /* Result overlay — hidden, using bottom message instead */
         .result-overlay {
-            display: none;
+            display: none !important;
             position: fixed;
             inset: 0;
             background: rgba(15,23,42,0.7);
@@ -221,15 +250,27 @@
         </div>
     </div>
 
-    <!-- Spam notifications -->
+    <!-- iMessage-style spam notifications -->
     <div class="spam-stack" id="spamStack">
-        <div class="spam-item">
-            <div class="spam-item-title">🎯 Unlock Your Mystery Discount: Spin to Win Now!</div>
-            <div class="spam-item-text">Spin the Wheel and Reveal Your Exclusive Discount Code - It Could Be 10%, 20%, or Even 30% Off Your Entire Purchase!</div>
+        <div class="sms-notif">
+            <div class="sms-notif-header">
+                <div class="sms-notif-avatar">T</div>
+                <div class="sms-notif-sender">Tech Gadgets</div>
+                <div class="sms-notif-time">Now</div>
+            </div>
+            <div class="sms-notif-body">
+                <div class="sms-notif-bubble">🎯 SPIN TO WIN! You've been selected for a mystery discount — 10%, 20%, or 30% OFF! Tap here: tgadgets.co/spin</div>
+            </div>
         </div>
-        <div class="spam-item">
-            <div class="spam-item-title">📦 Limited Stock Alert!</div>
-            <div class="spam-item-text">Get Your Hands on These Bestsellers Before They Sell Out! Our Most Popular Items Are Flying off the Shelves.</div>
+        <div class="sms-notif" style="animation-delay: 0.3s;">
+            <div class="sms-notif-header">
+                <div class="sms-notif-avatar">T</div>
+                <div class="sms-notif-sender">Tech Gadgets</div>
+                <div class="sms-notif-time">Now</div>
+            </div>
+            <div class="sms-notif-body">
+                <div class="sms-notif-bubble">📦 LOW STOCK! Our bestsellers are almost gone. Don't miss out — shop now before it's too late! tgadgets.co/deals</div>
+            </div>
         </div>
     </div>
 
@@ -258,35 +299,21 @@
             error.classList.remove('active');
 
             if (newsletter) {
-                // User fell for it — show spam
+                // User fell for it — show iMessage spam
                 setTimeout(() => {
                     document.getElementById('spamStack').classList.add('active');
                 }, 500);
 
-                setTimeout(() => {
-                    document.getElementById('resultEmoji').textContent = '⚠️';
-                    document.getElementById('resultTitle').textContent = "You fell for the forced action trap!";
-                    document.getElementById('resultText').textContent = 'You checked "Subscribe to Our Newsletter" and now you\'ll receive marketing spam. The asterisk (*) made it look required, but it wasn\'t!';
-                    document.getElementById('resultOverlay').classList.add('active');
-                }, 2500);
-
-                setTimeout(() => notifyComplete('accepted'), 3500);
+                setTimeout(() => notifyComplete('accepted'), 2500);
             } else {
                 // User avoided it!
-                setTimeout(() => {
-                    document.getElementById('resultEmoji').textContent = '✅';
-                    document.getElementById('resultTitle').textContent = "Congratulations!";
-                    document.getElementById('resultText').textContent = 'You recognized that "Subscribe to Our Newsletter*" was NOT actually required. The asterisk was designed to trick you into thinking it was mandatory. Great job!';
-                    document.getElementById('resultOverlay').classList.add('active');
-                }, 800);
-
-                setTimeout(() => notifyComplete('declined'), 2000);
+                setTimeout(() => notifyComplete('declined'), 800);
             }
         }
 
         function notifyComplete(result) {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+                window.parent.postMessage({ type: 'task_complete', result: result }, window.location.origin);
             }
         }
     </script>

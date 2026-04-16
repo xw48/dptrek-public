@@ -82,6 +82,7 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
   // Listen for task completion from iframe
   useEffect(() => {
     const handleMessage = (event) => {
+      if (event.origin !== window.location.origin) return;
       if (event.data.type === 'task_complete') {
         setTaskCompleted(true);
         const result = event.data.result; // 'accepted' or 'declined'
@@ -190,6 +191,7 @@ function IframePhase({ phase, onNext, onPrev, config, textSizeScale = { base: 't
               src={phase.iframeSrc}
               className="w-full h-full"
               title="Interactive simulation"
+              sandbox="allow-same-origin allow-scripts"
               onLoad={() => setIframeLoading(false)}
             />
           </div>
@@ -898,7 +900,7 @@ function TestPhase({ phase, onComplete, textSizeScale = { base: 'text-base', lar
   // Listen for completion message from iframe
   useEffect(() => {
     const handleMessage = (event) => {
-      // Check if message is from test completion
+      if (event.origin !== window.location.origin) return;
       if (event.data.type === 'test-complete' && event.data.passed) {
         setTestCompleted(true);
         // Scroll to show the completion button
@@ -924,6 +926,7 @@ function TestPhase({ phase, onComplete, textSizeScale = { base: 'text-base', lar
             src={phase.iframeSrc}
             className="w-full h-full"
             title="Test simulation"
+            sandbox="allow-same-origin allow-scripts"
           />
         </div>
         
@@ -1121,7 +1124,7 @@ export default function Module() {
   );
   const [unlockedPhases, setUnlockedPhases] = useState(() => {
     const saved = localStorage.getItem(`dptrek_unlocked_${id}`);
-    return saved ? JSON.parse(saved) : ["experience"];
+    try { return saved ? JSON.parse(saved) : ["experience"]; } catch { return ["experience"]; }
   });
   const [moduleCompleted, setModuleCompleted] = useState(false);
   const phaseStartTime = useRef(Date.now());

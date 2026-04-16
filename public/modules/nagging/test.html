@@ -778,13 +778,13 @@
                     score: score,
                     total: 2,
                     passed: score >= 2
-                }, '*');
+                }, window.location.origin);
             }
         }
 
         function notifyInteraction() {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'user_interacted' }, '*');
+                window.parent.postMessage({ type: 'user_interacted' }, window.location.origin);
             }
         }
     </script>

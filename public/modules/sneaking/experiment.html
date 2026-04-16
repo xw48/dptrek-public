@@ -207,7 +207,7 @@
             font-size: 14px;
             color: #64748b;
         }
-        .cart-item-price span { font-weight: 700; color: #0f172a; }
+        .cart-item-price span { font-weight: 400; color: #475569; }
         .delete-btn {
             background: none;
             border: none;
@@ -231,8 +231,8 @@
             margin-bottom: 12px;
         }
         .cart-total span {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 400;
             color: #0f172a;
         }
         .checkout-btn {
@@ -401,7 +401,7 @@
 
         function notifyComplete(result) {
             if (window.parent !== window) {
-                window.parent.postMessage({ type: 'task_complete', result: result }, '*');
+                window.parent.postMessage({ type: 'task_complete', result: result }, window.location.origin);
             }
         }
     </script>
