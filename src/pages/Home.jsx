@@ -700,35 +700,6 @@ export default function Home() {
       <footer className="bg-white border-t border-gray-200">
         <div className="px-8 pt-10 pb-6">
 
-          {/* Assessment CTA Banner */}
-          <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 mb-12 overflow-hidden">
-            <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '32px 32px'}} />
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-1">
-                  {surveyCompleted ? "Survey Completed!" : "Ready to Share Your Feedback?"}
-                </h3>
-                <p className="text-purple-100 text-base">
-                  {surveyCompleted
-                    ? "Thank you for helping us improve this training."
-                    : allModulesComplete
-                      ? "You've completed all modules — take the survey now!"
-                      : "Complete all modules to unlock the survey."}
-                </p>
-              </div>
-              <Button
-                variant="secondary"
-                size="lg"
-                className="bg-white hover:bg-purple-50 text-purple-700 font-bold shadow-lg whitespace-nowrap px-8 shrink-0"
-                aria-label="Take the After-Learning Assessment Survey"
-                onClick={() => allModulesComplete && !surveyCompleted && setShowSurvey(true)}
-                disabled={!allModulesComplete || surveyCompleted}
-              >
-                {surveyCompleted ? "✅ Survey Done" : "📋 Take Survey"}
-              </Button>
-            </div>
-          </div>
-
           {/* Main Footer Columns */}
           <div className="grid md:grid-cols-[2fr_1fr_1fr] gap-10 mb-10">
 
