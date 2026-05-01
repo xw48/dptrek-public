@@ -566,6 +566,98 @@ Each user gets a persistent `sessionId` stored in localStorage (`dptrek_session_
 **phase_tracking:**
 - `session_id`, `module_id`, `module_title`, `phase`, `action`
 
+### Supabase SQL Setup
+
+To set up the database from scratch, run the following SQL in the **Supabase SQL Editor** (`Project → SQL Editor → New Query`):
+
+```sql
+-- Drop existing tables if any (fresh start)
+DROP TABLE IF EXISTS phase_tracking;
+DROP TABLE IF EXISTS module_completions;
+DROP TABLE IF EXISTS test_results;
+DROP TABLE IF EXISTS reflection_responses;
+DROP TABLE IF EXISTS feedback;
+DROP TABLE IF EXISTS sessions;
+
+-- 1. Sessions
+CREATE TABLE sessions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT UNIQUE NOT NULL,
+  text_size TEXT DEFAULT 'medium',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Reflection Responses
+CREATE TABLE reflection_responses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  module_id INTEGER NOT NULL,
+  module_title TEXT NOT NULL,
+  question_id TEXT NOT NULL,
+  question_text TEXT,
+  answer_type TEXT NOT NULL,
+  selected_option TEXT,
+  selected_option_text TEXT,
+  other_text TEXT,
+  comment TEXT,
+  selected_feelings TEXT[],
+  intensity INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Test Results
+CREATE TABLE test_results (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  module_id INTEGER NOT NULL,
+  module_title TEXT NOT NULL,
+  score INTEGER,
+  total INTEGER,
+  passed BOOLEAN,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Module Completions
+CREATE TABLE module_completions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  module_id INTEGER NOT NULL,
+  module_title TEXT NOT NULL,
+  completed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Feedback
+CREATE TABLE feedback (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT,
+  name TEXT,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. Phase Tracking
+CREATE TABLE phase_tracking (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  module_id INTEGER NOT NULL,
+  module_title TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  action TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Disable RLS on all tables (for public educational tool)
+ALTER TABLE sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE reflection_responses DISABLE ROW LEVEL SECURITY;
+ALTER TABLE test_results DISABLE ROW LEVEL SECURITY;
+ALTER TABLE module_completions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE feedback DISABLE ROW LEVEL SECURITY;
+ALTER TABLE phase_tracking DISABLE ROW LEVEL SECURITY;
+```
+
+> **How to run:** Go to your Supabase dashboard → click **SQL Editor** in the left sidebar → click **New Query** → paste the entire SQL block above → click **Run**. All 6 tables will be created and RLS will be disabled.
+
 ---
 
 ## 13. Analytics — PostHog
