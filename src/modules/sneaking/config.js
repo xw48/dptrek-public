@@ -71,13 +71,91 @@ const sneakingConfig = {
           icon: "🛒",
           title: "Real-world Example #1: SportsDirect",
           text: "SportsDirect.com secretly added a magazine subscription to customers' shopping baskets.",
-          detail: "In 2015, UK sports retailer SportsDirect.com was found to be Sneaking an unwanted magazine subscription into users' shopping baskets during the checkout process. The magazine cost an extra \u00A31, and was added without users' explicit consent or knowledge. If users noticed it, they had to actively remove it from their basket if they did not wish to purchase it."
+          interactive: {
+            icon: "\uD83D\uDED2",
+            title: "Real-world Example #1: SportsDirect",
+            images: [
+              "/sneaking-sportsdirect-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how SportsDirect.com sneaked an unwanted item into customers' shopping baskets.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "In 2015, SportsDirect.com was caught adding a magazine subscription to users' baskets during checkout \u2014 without their knowledge or consent!",
+                imageIndex: 0,
+                highlights: [
+                  { top: '70%', left: '12%', width: '60%', height: '7%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Sneaked into your basket!', top: '62%', left: '20%' }
+                ]
+              },
+              {
+                text: "The magazine cost an extra \u00A31. Users had to actively notice and remove it \u2014 if they didn't, they'd be charged for something they never asked for.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '70%', left: '12%', width: '60%', height: '7%' },
+                  { top: '78%', left: '40%', width: '15%', height: '5%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Extra \u00A31 charge!', top: '62%', left: '50%' },
+                  { text: 'Must manually remove', top: '85%', left: '38%' }
+                ]
+              }
+            ]
+          }
         },
         {
           icon: "🚗",
           title: "Real-world Example #2: RAC.co.uk",
           text: "RAC.co.uk forces users to click 'More info' to opt out of sharing information and email spam.",
-          detail: "RAC.co.uk forces users to select 'More info' to be able to opt out of sharing information and email spam. If users click 'Continue' directly, they will receive mail and email about exclusive offers. The opt-out option is hidden behind an extra click that most users won't notice."
+          interactive: {
+            icon: "🚗",
+            title: "Real-world Example #2: RAC.co.uk",
+            images: [
+              "/sneaking-rac-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how RAC.co.uk hides the opt-out option behind an extra step.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "RAC.co.uk shows a 'Continue' button prominently. If you click it directly, you'll automatically receive marketing emails and mail about 'exclusive offers'.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '74%', left: '17%', width: '30%', height: '8%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Clicking = opting in!', top: '66%', left: '17%' }
+                ]
+              },
+              {
+                text: "To opt OUT, you must first click a small 'More info' link — the opt-out checkbox is hidden behind this extra step. Most users won't notice it and will unknowingly agree to spam.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '57%', left: '17%', width: '30%', height: '12%' },
+                  { top: '74%', left: '17%', width: '30%', height: '8%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Hidden opt-out here!', top: '50%', left: '17%' },
+                  { text: 'Most people just click this', top: '83%', left: '15%' }
+                ]
+              }
+            ]
+          }
         },
       ],
     },

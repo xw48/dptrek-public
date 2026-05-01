@@ -71,13 +71,91 @@ const interferenceConfig = {
           icon: "📱",
           title: "Real-world Example #1: Twitter",
           text: "Twitter used a pre-checked option to auto-follow their promotional account.",
-          detail: "Twitter showed a popup asking users to connect their account, but the option to follow @Links_com for news and tips was already checked. If users clicked 'Connect Twitter account' without noticing, promotional posts would appear in their feed automatically."
+          interactive: {
+            icon: "📱",
+            title: "Real-world Example #1: Twitter",
+            images: [
+              "/interference-twitter-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Twitter used interface interference to trick users into following a promotional account.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "Twitter shows a popup asking users to connect their account. Look carefully — the option to follow @Links_com is already pre-checked!",
+                imageIndex: 0,
+                highlights: [
+                  { top: '63%', left: '15%', width: '60%', height: '8%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Pre-checked by default!', top: '55%', left: '15%' }
+                ]
+              },
+              {
+                text: "If users click 'Connect Twitter account' without noticing the pre-checked box, promotional posts from @Links_com would automatically appear in their feed.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '63%', left: '15%', width: '60%', height: '8%' },
+                  { top: '50%', left: '23%', width: '50%', height: '10%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Hidden checkbox', top: '55%', left: '15%' },
+                  { text: 'Easy to miss!', top: '42%', left: '25%' }
+                ]
+              }
+            ]
+          }
         },
         {
           icon: "📲",
           title: "Real-world Example #2: Next.co.uk",
           text: "Next.co.uk pre-selected a 'free directory' that actually led to credit checks.",
-          detail: "On Next.co.uk, the radio button for a 'free first Next directory' was pre-selected. However, if users didn't read the fine print, they may unknowingly consent to a credit check and the opening of a credit account that sends brochures four times a year, each costing £3.75."
+          interactive: {
+            icon: "📲",
+            title: "Real-world Example #2: Next.co.uk",
+            images: [
+              "/interference-next-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Next.co.uk used a pre-selected option to trick users into a credit account.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "On Next.co.uk, the radio button for a 'free first Next directory' was already pre-selected. It looks like a harmless freebie...",
+                imageIndex: 0,
+                highlights: [
+                  { top: '20%', left: '6%', width: '70%', height: '7%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Pre-selected for you!', top: '13%', left: '10%' }
+                ]
+              },
+              {
+                text: "But the fine print reveals: accepting this 'free directory' means consenting to a credit check and opening a credit account that sends brochures 4 times a year — each costing £3.75!",
+                imageIndex: 0,
+                highlights: [
+                  { top: '20%', left: '6%', width: '70%', height: '7%' },
+                  { top: '50%', left: '6%', width: '60%', height: '15%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Looks free...', top: '13%', left: '10%' },
+                  { text: 'Hidden cost: £3.75 x 4/year!', top: '67%', left: '8%' }
+                ]
+              }
+            ]
+          }
         },
       ],
     },

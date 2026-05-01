@@ -71,13 +71,90 @@ const forcedActionConfig = {
           icon: "\uD83C\uDFAE",
           title: "Real-world Example #1: Dawn of War III",
           text: "In the sign-up page of Dawn of War III, users were required to subscribe to the newsletter to create an account.",
-          detail: "The game\u2019s registration page forced users to subscribe to a newsletter before they could create an account. There was no way to opt out \u2014 if you wanted to play, you had to agree to receive marketing emails. This is a classic forced action pattern."
+          interactive: {
+            icon: "\uD83C\uDFAE",
+            title: "Real-world Example #1: Dawn of War III",
+            images: [
+              "/forced-action-dow3-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Dawn of War III forced users into a newsletter subscription just to play the game.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "The game's registration page has a mandatory newsletter subscription checkbox. Notice \u2014 it cannot be unchecked!",
+                imageIndex: 0,
+                highlights: [
+                  { top: '73%', left: '20%', width: '60%', height: '10%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Cannot be unchecked!', top: '65%', left: '18%' }
+                ]
+              },
+              {
+                text: "If you want to play the game, you MUST agree to receive marketing emails. There is no way to opt out \u2014 this is a classic forced action pattern.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '73%', left: '20%', width: '60%', height: '10%' },
+                  { top: '85%', left: '30%', width: '40%', height: '7%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Forced subscription!', top: '65%', left: '18%' },
+                  { text: 'No choice but to agree', top: '93%', left: '30%' }
+                ]
+              }
+            ]
+          }
         },
         {
           icon: "\uD83C\uDF10",
           title: "Real-world Example #2: Better Working World (EY)",
           text: "Better Working World forced users to accept the use of cookies on the site or they cannot continue.",
-          detail: "The website displayed a cookie consent popup with only \u201CYes, I accept\u201D as the primary option. Users who disagreed had no clear way to decline and still use the site. The only alternative was to leave entirely \u2014 making cookie acceptance a forced action."
+          interactive: {
+            icon: "\uD83C\uDF10",
+            title: "Real-world Example #2: Better Working World (EY)",
+            images: [
+              "/forced-action-ey-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Better Working World (EY) forced users to accept cookies with no alternative.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "The website displays a cookie consent popup. Notice there's only one option: 'Yes, I accept'. There is no 'Decline' or 'No' button.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '38%', left: '13%', width: '74%', height: '20%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Only option: Accept!', top: '30%', left: '15%' }
+                ]
+              },
+              {
+                text: "Users who disagree have no way to decline and still use the site. The only alternative is to leave entirely \u2014 making cookie acceptance a forced action.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '38%', left: '13%', width: '74%', height: '20%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Accept or leave!', top: '30%', left: '15%' },
+                  { text: 'No decline option exists', top: '60%', left: '15%' }
+                ]
+              }
+            ]
+          }
         },
       ],
     },

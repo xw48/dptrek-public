@@ -72,13 +72,87 @@ export const naggingConfig = {
           icon: "📱",
           title: "Real-world Example #1: Instagram",
           text: "Instagram used nagging to pressure users into turning on notifications.",
-          detail: "In 2018, Instagram aggressively nagged users to turn on notifications, pestering them regularly over a period of months. Users were not able to say NO — the only option to make the nagging stop was to turn on notifications. This is a classic example of nagging in action."
+          interactive: {
+            icon: "📱",
+            title: "Real-world Example #1: Instagram",
+            images: [
+              "/nagging-instagram-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Instagram uses nagging to pressure users into enabling notifications.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "Instagram shows a popup asking you to 'Turn On Notifications'. Notice there's no permanent 'No' option — only 'Not Now', which means it will ask again later.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '54%', left: '23%', width: '54%', height: '8%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'No permanent "No" option!', top: '46%', left: '5%' }
+                ]
+              },
+              {
+                text: "In 2018, Instagram aggressively nagged users over a period of months. The only way to stop the nagging was to give in and turn on notifications — exactly what Instagram wanted.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '38%', left: '23%', width: '54%', height: '24%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Keeps coming back!', top: '32%', left: '23%' }
+                ]
+              }
+            ]
+          }
         },
         {
           icon: "📲",
           title: "Real-world Example #2: Google Location",
           text: "Google repeatedly asks for location permission with no permanent 'No' option.",
-          detail: "Google repeatedly asks for permission to use location data, only allowing 'Not now' to be selected — pestering the user until they give permission. There is no permanent 'No' option, so the request keeps coming back no matter how many times you dismiss it."
+          interactive: {
+            icon: "📲",
+            title: "Real-world Example #2: Google Location",
+            images: [
+              "/nagging-google-1.png"
+            ],
+            steps: [
+              {
+                text: "Click 'Next' to see how Google uses nagging to get your location permission.",
+                imageIndex: 0,
+                highlights: [],
+                arrows: [],
+                labels: []
+              },
+              {
+                text: "Google shows a location permission request. Notice the options: there's no permanent 'No' — only 'Not now', so the request keeps coming back.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '78%', left: '20%', width: '60%', height: '8%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: '"Not now" = Ask again later', top: '70%', left: '5%' }
+                ]
+              },
+              {
+                text: "No matter how many times you dismiss it, Google keeps asking for location access. The persistent nagging is designed to wear you down until you finally click 'Allow'.",
+                imageIndex: 0,
+                highlights: [
+                  { top: '20%', left: '18%', width: '64%', height: '68%' }
+                ],
+                arrows: [],
+                labels: [
+                  { text: 'Pestering until you give in!', top: '12%', left: '18%' }
+                ]
+              }
+            ]
+          }
         },
       ],
     },
