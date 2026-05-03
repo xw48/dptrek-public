@@ -4,7 +4,7 @@ import posthog from 'posthog-js';
 export const initPostHog = () => {
   if (typeof window !== 'undefined') {
     posthog.init(
-      'phc_PYstlQ5v5rqOBBNa1FwzYcTbCA6GpTcV4V8JDUnxbU8', // Replace with your actual PostHog API key
+      'phc_sbYFwrD5iBVnQdYrsJrCisi7cqgESgaLfgAxceoguJCt', // Replace with your actual PostHog API key
       {
         api_host: 'https://app.posthog.com', // Or your self-hosted URL
         loaded: (posthog) => {

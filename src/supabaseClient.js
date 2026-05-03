@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 // Replace these with your Supabase project credentials
 // Find them at: supabase.com → Your Project → Settings → API
 // =============================================
-const SUPABASE_URL = 'https://iwagajqgbatqtxntzhth.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3YWdhanFnYmF0cXR4bnR6aHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjA3MDksImV4cCI6MjA4OTQzNjcwOX0.-B8EFoxEpwmKJXEcd28XTdy4gYw1FQqgYwlvzeXpep0';
+const SUPABASE_URL = 'https://fdgyovsphrsrfqfmfbiz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3lvdnNwaHJzcmZxZm1mYml6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjQ3NDcsImV4cCI6MjA5MzQwMDc0N30.SYrSx6PoMKLkdNWg8eByKlmyCYs4gK8CyaH-ms1NLrk';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
