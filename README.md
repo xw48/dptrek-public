@@ -1,6 +1,6 @@
-# DP Trek — Developer Documentation
+# DPTrek — Developer Documentation
 
-> **Dark Patterns Education Platform for Older Adults**
+> **This is the source code repo corresponding to the DPTrek live demo on https://dptrek-psi.vercel.app/**
 > Last updated: April 2026
 
 ---
