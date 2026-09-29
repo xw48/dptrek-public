@@ -1,7 +1,7 @@
 # DPTrek — Developer Documentation
 
-> **This is the source code repo corresponding to the DPTrek live demo on https://dptrek-psi.vercel.app/**
-> Last updated: April 2026
+> **This is a snapshot repo for the DPTrek live demo hosted on https://dptrek-psi.vercel.app/**
+> Last updated: Sep 2026
 
 ---
 
